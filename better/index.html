@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jung's AI Learning Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header h1 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .energy-tracker {
+            grid-column: span 2;
+        }
+
+        .energy-visual {
+            background: #f0f4f8;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .energy-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            transition: all 1s ease;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .energy-bar::after {
+            content: attr(data-energy) '%';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ai-chat {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .message.ai {
+            background: linear-gradient(45deg, #e6f3ff, #f0f8ff);
+            border-left: 4px solid #667eea;
+        }
+
+        .message.user {
+            background: #f7fafc;
+            border-left: 4px solid #a0aec0;
+            margin-left: 20px;
+        }
+
+        .logs-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease;
+        }
+
+        .shadow-work {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .practice-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+
+        .api-config {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .api-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .api-status.connected {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .api-status.disconnected {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .jung-quote {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            font-style: italic;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .energy-tracker {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Jung's AI Learning Companion</h1>
+            <p>Transform your energy drains into opportunities for self-discovery through AI-powered insights and Jung's shadow work</p>
+        </div>
+
+        <div class="card api-config">
+            <h3>AI Configuration</h3>
+            <div class="input-group">
+                <label for="api-provider">AI Provider:</label>
+                <select id="api-provider">
+                    <option value="anthropic">Anthropic Claude</option>
+                    <option value="google">Google Gemini</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="api-key">API Key:</label>
+                <input type="password" id="api-key" placeholder="Enter your API key">
+            </div>
+            <button class="btn" onclick="saveApiConfig()">Save Configuration</button>
+            <div style="margin-top: 10px;">
+                Status: <span class="api-status disconnected" id="api-status">Disconnected</span>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card energy-tracker">
+                <h2>Daily Energy Tracker</h2>
+                <div class="energy-visual">
+                    <div class="energy-bar" id="energy-bar" data-energy="100" style="width: 100%"></div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="input-group">
+                        <label for="trigger-type">What triggered you?</label>
+                        <select id="trigger-type">
+                            <option value="conversation">Draining Conversation</option>
+                            <option value="thought">Obsessive Thought</option>
+                            <option value="situation">Stressful Situation</option>
+                            <option value="reaction">Emotional Reaction</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="drain-level">Energy Drain (1-10):</label>
+                        <input type="range" id="drain-level" min="1" max="10" value="5" oninput="updateDrainLabel(this.value)">
+                        <span id="drain-label">5</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="trigger-description">Describe what happened:</label>
+                    <textarea id="trigger-description" rows="3" placeholder="What exactly triggered you? Be specific..."></textarea>
+                </div>
+                
+                <button class="btn" onclick="logTrigger()">Log & Get AI Insights</button>
+            </div>
+
+            <div class="card shadow-work">
+                <h2>What You'll Discover</h2>
+                <div class="jung-quote" id="jung-quote">
+                    "What you deny controls you. What you accept transforms you." - Carl Jung
+                </div>
+                <div id="shadow-insights">
+                    <p><strong>Ever wonder why certain people or situations trigger you so much?</strong></p>
+                    <p>Often, what bothers us most about others is something we haven't accepted about ourselves. This isn't your fault - it's just how our minds work!</p>
+                    <p>Start logging your triggers and our AI companion will help you discover what these moments are trying to teach you about yourself.</p>
+                    <p><em>No psychology degree required - just curiosity about yourself!</em></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>AI Dialogue</h2>
+                <div class="ai-chat" id="ai-chat">
+                    <div class="message ai">
+                        <strong>Your Learning Companion:</strong> Hi! I'm here to help you understand why certain things trigger you and turn those moments into opportunities to learn about yourself. When you log something that drained your energy, I'll ask you simple questions to help you discover what's really going on underneath. Think of me as a curious friend who helps you connect the dots.
+                    </div>
+                </div>
+                <div class="input-group" style="margin-top: 16px;">
+                    <textarea id="user-message" rows="2" placeholder="Ask me anything about your triggers, patterns, or just say 'I don't understand' if something doesn't make sense..."></textarea>
+                </div>
+                <button class="btn" onclick="sendMessage()">Send Message</button>
+            </div>
+
+            <div class="card">
+                <h2>Daily Practices</h2>
+                <div id="practices">
+                    <div class="practice-card">
+                        <h4>Morning Intention</h4>
+                        <p>Set your intention: "Today, I choose to respond rather than react."</p>
+                        <button class="btn" onclick="markPracticeComplete('morning')">Mark Complete</button>
+                    </div>
+                    <div class="practice-card">
+                        <h4>Evening Reflection</h4>
+                        <p>Ask yourself: "Where did I choose consciousness today? What can I learn?"</p>
+                        <button class="btn" onclick="markPracticeComplete('evening')">Mark Complete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Your Trigger Patterns</h2>
+            <div class="logs-grid" id="logs-container">
+                <!-- Logs will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let apiConfig = JSON.parse(localStorage.getItem('apiConfig')) || {};
+        let energyLogs = JSON.parse(localStorage.getItem('energyLogs')) || [];
+        let dailyEnergy = 100;
+        let conversationHistory = [];
+
+        // Jung quotes for rotation
+        const jungQuotes = [
+            "What you deny controls you. What you accept transforms you.",
+            "He who looks outside dreams; he who looks inside awakens.",
+            "Until you make the unconscious conscious, it will direct your life and you will call it fate.",
+            "You are not your reactions. You are the awareness that can choose how to respond.",
+            "Everything that irritates us about others can lead us to an understanding of ourselves."
+        ];
+
+        // Initialize app
+        function init() {
+            updateEnergyBar();
+            loadLogs();
+            loadApiConfig();
+            rotateQuote();
+            setInterval(rotateQuote, 10000); // Rotate quotes every 10 seconds
+        }
+
+        function rotateQuote() {
+            const quoteElement = document.getElementById('jung-quote');
+            const randomQuote = jungQuotes[Math.floor(Math.random() * jungQuotes.length)];
+            quoteElement.innerHTML = `"${randomQuote}" - Carl Jung`;
+        }
+
+        function updateDrainLabel(value) {
+            document.getElementById('drain-label').textContent = value;
+        }
+
+        function updateEnergyBar() {
+            const today = new Date().toDateString();
+            const todayDrains = energyLogs.filter(log => 
+                new Date(log.timestamp).toDateString() === today
+            );
+            const totalDrain = todayDrains.reduce((sum, log) => sum + (log.drainLevel * 10), 0);
+            const remaining = Math.max(100 - totalDrain, 0);
+            
+            const energyBar = document.getElementById('energy-bar');
+            energyBar.style.width = `${remaining}%`;
+            energyBar.setAttribute('data-energy', remaining);
+            
+            // Change color based on energy level
+            if (remaining > 70) {
+                energyBar.style.background = 'linear-gradient(45deg, #48bb78, #38a169)';
+            } else if (remaining > 40) {
+                energyBar.style.background = 'linear-gradient(45deg, #ed8936, #dd6b20)';
+            } else {
+                energyBar.style.background = 'linear-gradient(45deg, #e53e3e, #c53030)';
+            }
+        }
+
+        function saveApiConfig() {
+            const provider = document.getElementById('api-provider').value;
+            const apiKey = document.getElementById('api-key').value;
+            
+            if (!apiKey) {
+                alert('Please enter an API key');
+                return;
+            }
+
+            apiConfig = { provider, apiKey };
+            localStorage.setItem('apiConfig', JSON.stringify(apiConfig));
+            
+            const statusEl = document.getElementById('api-status');
+            statusEl.textContent = 'Connected';
+            statusEl.className = 'api-status connected';
+            
+            alert('API configuration saved successfully!');
+        }
+
+        function loadApiConfig() {
+            if (apiConfig.provider) {
+                document.getElementById('api-provider').value = apiConfig.provider;
+                const statusEl = document.getElementById('api-status');
+                statusEl.textContent = 'Connected';
+                statusEl.className = 'api-status connected';
+            }
+        }
+
+        async function logTrigger() {
+            const type = document.getElementById('trigger-type').value;
+            const description = document.getElementById('trigger-description').value;
+            const drainLevel = parseInt(document.getElementById('drain-level').value);
+
+            if (!description.trim()) {
+                alert('Please describe what triggered you');
+                return;
+            }
+
+            const log = {
+                id: Date.now(),
+                type,
+                description,
+                drainLevel,
+                timestamp: new Date().toISOString()
+            };
+
+            energyLogs.unshift(log); // Add to beginning
+            localStorage.setItem('energyLogs', JSON.stringify(energyLogs));
+            
+            updateEnergyBar();
+            loadLogs();
+            
+            // Clear form
+            document.getElementById('trigger-description').value = '';
+            document.getElementById('drain-level').value = 5;
+            updateDrainLabel(5);
+
+            // Get AI insights
+            await getAIInsights(log);
+        }
+
+        async function getAIInsights(log) {
+            if (!apiConfig.apiKey) {
+                addAIMessage("Please configure your API key first to receive personalized insights.");
+                return;
+            }
+
+            const prompt = createInsightPrompt(log);
+            
+            try {
+                addAIMessage("Let me think about what happened here... 🤔");
+                
+                // Simulate API call (replace with actual API integration)
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Add gentle introduction for first-time users
+                const isFirstLog = energyLogs.length === 1;
+                if (isFirstLog) {
+                    addAIMessage("Here's something interesting I noticed about your trigger. Don't worry if this seems new to you - we'll explore it step by step!");
+                }
+                
+                // Mock AI response (replace with actual API response)
+                const mockResponse = generateMockInsight(log);
+                addAIMessage(mockResponse);
+                
+                // Add follow-up questions
+                setTimeout(() => {
+                    const followUp = generateFollowUpQuestion(log);
+                    addAIMessage(followUp);
+                }, 2000);
+                
+            } catch (error) {
+                addAIMessage("Sorry, I couldn't analyze your trigger right now. Try again later.");
+            }
+        }
+
+        function createInsightPrompt(log) {
+            const recentLogs = energyLogs.slice(0, 5);
+            return `
+You are a friendly learning companion helping someone understand their emotional triggers. Use simple, conversational language.
+
+What happened: ${log.description}
+How draining it was: ${log.drainLevel}/10
+Type of trigger: ${log.type}
+
+Recent patterns: ${JSON.stringify(recentLogs)}
+
+Please provide:
+1. A simple, relatable insight about what this trigger might reveal (avoid psychology jargon)
+2. A gentle, curious question to help them explore deeper
+3. A simple practice they can try
+4. Connection to any patterns you notice
+
+Be conversational, supportive, and explain concepts in everyday language. Think like a wise friend, not a therapist.
+            `;
+        }
+
+        function generateMockInsight(log) {
+            const insights = {
+                conversation: `I notice this conversation drained your energy. Here's what's interesting: when someone really gets under our skin, it's often because they're showing us something we don't like about ourselves. Think of it like a mirror - what bothered you most about how they acted?`,
+                thought: `Those repeating thoughts are your mind trying to tell you something important. When our brain keeps replaying the same worry or fear, it's usually pointing to something we need to pay attention to. What do you think this thought is trying to protect you from?`,
+                situation: `Stressful situations show us where we're still reacting automatically instead of choosing how to respond. Imagine having a pause button between what happens and how you react - what would you do differently if you had that pause?`,
+                reaction: `Strong emotions are actually messengers. They're trying to tell us something about what we need or what hurts. Instead of judging this feeling, what if we got curious about what it's trying to communicate?`
+            };
+            
+            return insights[log.type] || "This trigger is showing you something important about yourself. Let's explore what it might be teaching you.";
+        }
+
+        function generateFollowUpQuestion(log) {
+            const questions = [
+                "When you were younger, did anyone ever make you feel this same way? Sometimes our strongest reactions today connect to old experiences.",
+                "If this situation was trying to teach you something about yourself, what might that lesson be?",
+                "What would it look like if you responded to this from a place of confidence rather than defensiveness?",
+                "What if this uncomfortable feeling is actually trying to help you in some way? What might it be protecting?"
+            ];
+            
+            return "🤔 Let's go deeper: " + questions[Math.floor(Math.random() * questions.length)];
+        }
+
+        function addAIMessage(message) {
+            const chatContainer = document.getElementById('ai-chat');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ai';
+            messageDiv.innerHTML = `<strong>Your Learning Companion:</strong> ${message}`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function addUserMessage(message) {
+            const chatContainer = document.getElementById('ai-chat');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            messageDiv.innerHTML = `<strong>You:</strong> ${message}`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const messageInput = document.getElementById('user-message');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            addUserMessage(message);
+            messageInput.value = '';
+            
+            // Check for confusion and provide explanations
+            if (message.toLowerCase().includes('don\'t understand') || 
+                message.toLowerCase().includes('confused') ||
+                message.toLowerCase().includes('what do you mean')) {
+                setTimeout(() => {
+                    addAIMessage("No worries! Let me explain it differently. Think of it like this: when someone really annoys you, it's often because they're doing something you secretly worry you do too. It's like looking in a mirror - what you see in them might actually be showing you something about yourself. Does that make more sense?");
+                }, 1000);
+                return;
+            }
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const responses = [
+                    "That's a really insightful observation. You know, just noticing these patterns is the first step toward changing them.",
+                    "What you're describing sounds familiar - sometimes we get upset with others because they remind us of something we don't like about ourselves. Have you noticed this pattern before?",
+                    "It sounds like this situation is trying to teach you something. What if instead of fighting it, we got curious about what it's showing you?",
+                    "Here's a thought: what if accepting this difficult feeling, instead of pushing it away, could actually help you understand yourself better?"
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addAIMessage(randomResponse);
+            }, 1000);
+        }
+
+        function loadLogs() {
+            const container = document.getElementById('logs-container');
+            container.innerHTML = '';
+            
+            energyLogs.slice(0, 10).forEach(log => {
+                const logDiv = document.createElement('div');
+                logDiv.className = 'log-entry';
+                logDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${log.type.charAt(0).toUpperCase() + log.type.slice(1)}</strong>
+                            <span style="margin-left: 10px; color: #666;">Drain: ${log.drainLevel}/10</span>
+                        </div>
+                        <small>${new Date(log.timestamp).toLocaleDateString()}</small>
+                    </div>
+                    <p style="margin-top: 8px;">${log.description}</p>
+                `;
+                container.appendChild(logDiv);
+            });
+        }
+
+        function markPracticeComplete(practice) {
+            const today = new Date().toDateString();
+            const completedPractices = JSON.parse(localStorage.getItem('completedPractices')) || {};
+            
+            if (!completedPractices[today]) {
+                completedPractices[today] = [];
+            }
+            
+            if (!completedPractices[today].includes(practice)) {
+                completedPractices[today].push(practice);
+                localStorage.setItem('completedPractices', JSON.stringify(completedPractices));
+                
+                addAIMessage(`Great job completing your ${practice} practice! Building these small daily habits is how real change happens. 🌟`);
+            }
+        }
+
+        // Handle Enter key in message input
+        document.getElementById('user-message').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Initialize app when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
