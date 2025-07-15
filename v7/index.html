@@ -919,22 +919,28 @@
         }
 
         function generateEnhancedInsight(log) {
-            const userName = userProfile.name || 'friend';
-            const timeContext = getTimeContext(log.context.timeOfDay);
-            const locationContext = log.context.location;
-            const emotionalContext = log.context.emotionalState;
-            
-            const contextualInsights = {
-                conversation: `${userName}, I notice this conversation happened ${timeContext} at ${locationContext} when you were already feeling ${emotionalContext}. Here's what's fascinating: draining conversations often mirror our internal conflicts. The specific way this person triggered you might be showing you an aspect of yourself that needs attention. What did their behavior remind you of?`,
+            try {
+                const userName = userProfile.name || 'friend';
+                const timeContext = getTimeContext(log.context?.timeOfDay || '12:00');
+                const locationContext = log.context?.location || 'somewhere';
+                const emotionalContext = log.context?.emotionalState || 'neutral';
                 
-                thought: `${userName}, those obsessive thoughts at ${timeContext} - especially when you were ${emotionalContext} - are your unconscious trying to process something important. Jung believed repetitive thoughts point to unintegrated shadow material. Since your main challenge is ${userProfile.mainChallenge || 'emotional regulation'}, this pattern might be connected to that deeper theme.`,
+                const contextualInsights = {
+                    conversation: `${userName}, I notice this conversation happened ${timeContext} at ${locationContext} when you were already feeling ${emotionalContext}. Here's what's fascinating: draining conversations often mirror our internal conflicts. The specific way this person triggered you might be showing you an aspect of yourself that needs attention. What did their behavior remind you of?`,
+                    
+                    thought: `${userName}, those obsessive thoughts at ${timeContext} - especially when you were ${emotionalContext} - are your unconscious trying to process something important. Jung believed repetitive thoughts point to unintegrated shadow material. Since your main challenge is ${userProfile.mainChallenge || 'emotional regulation'}, this pattern might be connected to that deeper theme.`,
+                    
+                    situation: `${userName}, this ${locationContext} situation at ${timeContext} reveals something about your stress response patterns. When you were already ${emotionalContext}, this trigger exposed where you still react automatically. This is actually valuable data about your growth edge!`,
+                    
+                    reaction: `${userName}, that emotional surge at ${timeContext} - particularly since you were ${emotionalContext} beforehand - is your body's wisdom speaking. Strong reactions often point to old wounds seeking healing. Given your goal around ${userProfile.mainChallenge || 'emotional growth'}, this is exactly the kind of moment that can transform you.`
+                };
                 
-                situation: `${userName}, this ${locationContext} situation at ${timeContext} reveals something about your stress response patterns. When you were already ${emotionalContext}, this trigger exposed where you still react automatically. This is actually valuable data about your growth edge!`,
-                
-                reaction: `${userName}, that emotional surge at ${timeContext} - particularly since you were ${emotionalState} beforehand - is your body's wisdom speaking. Strong reactions often point to old wounds seeking healing. Given your goal around ${userProfile.mainChallenge || 'emotional growth'}, this is exactly the kind of moment that can transform you.`
-            };
-            
-            return contextualInsights[log.type] || `${userName}, this trigger is revealing something important about your inner landscape. Let's explore what it's trying to teach you.`;
+                return contextualInsights[log.type] || `${userName}, this trigger is revealing something important about your inner landscape. Let's explore what it's trying to teach you.`;
+            } catch (error) {
+                console.error('Error in generateEnhancedInsight:', error);
+                const userName = userProfile.name || 'friend';
+                return `${userName}, I see this ${log.type} trigger is important to you. While I'm having trouble generating detailed context right now, I can tell this situation is worth exploring. What stood out most to you about what happened?`;
+            }
         }
 
         function getTimeContext(time) {
