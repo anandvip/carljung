@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jung's AI Learning Companion - Enhanced</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header h1 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .welcome-message {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .onboarding-card {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+        }
+
+        .energy-tracker {
+            grid-column: span 2;
+        }
+
+        .energy-visual {
+            background: #f0f4f8;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .energy-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            transition: all 1s ease;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .energy-bar::after {
+            content: attr(data-energy) '%';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+        }
+
+        .ai-chat {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .message.ai {
+            background: linear-gradient(45deg, #e6f3ff, #f0f8ff);
+            border-left: 4px solid #667eea;
+        }
+
+        .message.user {
+            background: #f7fafc;
+            border-left: 4px solid #a0aec0;
+            margin-left: 20px;
+        }
+
+        .message.system {
+            background: linear-gradient(45deg, #ffeaa7, #fdcb6e);
+            border-left: 4px solid #f39c12;
+            font-style: italic;
+        }
+
+        .logs-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        .log-entry .context-info {
+            background: #e2e8f0;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #4a5568;
+        }
+
+        .shadow-work {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .practice-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+
+        .api-config {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .api-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .api-status.connected {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .api-status.disconnected {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .resources-section {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c8);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .resource-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #48bb78;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .resource-item h4 {
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .resource-item .resource-type {
+            background: #48bb78;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .pattern-insight {
+            background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #e91e63;
+        }
+
+        .progress-indicator {
+            background: #f0f4f8;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            transition: width 0.3s ease;
+        }
+
+        .enhanced-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .enhanced-form .full-width {
+            grid-column: span 2;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .jung-quote {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            font-style: italic;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .energy-tracker, .onboarding-card {
+                grid-column: span 1;
+            }
+            .enhanced-form {
+                grid-template-columns: 1fr;
+            }
+            .enhanced-form .full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Jung's AI Learning Companion</h1>
+            <p>Transform your energy drains into opportunities for self-discovery through AI-powered insights and Jung's shadow work</p>
+            <div class="welcome-message" id="welcome-message">
+                <strong>Welcome back!</strong> I've been learning about your patterns and found some interesting insights to share with you.
+            </div>
+        </div>
+
+        <!-- Onboarding Section -->
+        <div class="card onboarding-card" id="onboarding-section">
+            <h2>✨ Let's Get to Know You Better</h2>
+            <p>To provide more personalized insights, I'd love to learn a bit about you. This helps me tailor my guidance to your unique journey.</p>
+            
+            <div class="enhanced-form" style="margin-top: 20px;">
+                <div class="input-group">
+                    <label for="user-name">What should I call you?</label>
+                    <input type="text" id="user-name" placeholder="Your first name">
+                </div>
+                <div class="input-group">
+                    <label for="user-age">Your age (optional)</label>
+                    <input type="number" id="user-age" placeholder="25" min="13" max="100">
+                </div>
+                <div class="input-group">
+                    <label for="learning-style">How do you prefer to learn?</label>
+                    <select id="learning-style">
+                        <option value="practical">Practical examples & exercises</option>
+                        <option value="theoretical">Deep concepts & theory</option>
+                        <option value="visual">Visual aids & diagrams</option>
+                        <option value="reflective">Journaling & self-reflection</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="main-challenge">What's your biggest emotional challenge?</label>
+                    <select id="main-challenge">
+                        <option value="anxiety">Anxiety & overthinking</option>
+                        <option value="anger">Anger & irritation</option>
+                        <option value="criticism">Handling criticism</option>
+                        <option value="relationships">Relationship conflicts</option>
+                        <option value="self-worth">Self-worth & confidence</option>
+                        <option value="stress">Work/life stress</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="input-group full-width">
+                    <label for="goals">What do you hope to achieve with emotional growth?</label>
+                    <textarea id="goals" rows="3" placeholder="E.g., Stay calm in difficult conversations, understand my triggers better, improve relationships..."></textarea>
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="completeOnboarding()">Start My Journey 🚀</button>
+        </div>
+
+        <div class="card api-config">
+            <h3>AI Configuration</h3>
+            <div class="input-group">
+                <label for="api-provider">AI Provider:</label>
+                <select id="api-provider">
+                    <option value="anthropic">Anthropic Claude</option>
+                    <option value="google">Google Gemini</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="api-key">API Key:</label>
+                <input type="password" id="api-key" placeholder="Enter your API key">
+            </div>
+            <button class="btn" onclick="saveApiConfig()">Save Configuration</button>
+            <div style="margin-top: 10px;">
+                Status: <span class="api-status disconnected" id="api-status">Disconnected</span>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card energy-tracker">
+                <h2>Enhanced Energy Tracker</h2>
+                <div class="energy-visual">
+                    <div class="energy-bar" id="energy-bar" data-energy="100" style="width: 100%"></div>
+                </div>
+                
+                <div class="enhanced-form">
+                    <div class="input-group">
+                        <label for="trigger-type">What triggered you?</label>
+                        <select id="trigger-type">
+                            <option value="conversation">Draining Conversation</option>
+                            <option value="thought">Obsessive Thought</option>
+                            <option value="situation">Stressful Situation</option>
+                            <option value="reaction">Emotional Reaction</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="drain-level">Energy Drain (1-10):</label>
+                        <input type="range" id="drain-level" min="1" max="10" value="5" oninput="updateDrainLabel(this.value)">
+                        <span id="drain-label">5</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="context-location">Where were you?</label>
+                        <select id="context-location">
+                            <option value="work">Work</option>
+                            <option value="home">Home</option>
+                            <option value="social">Social setting</option>
+                            <option value="online">Online/Social media</option>
+                            <option value="public">Public space</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="emotional-state">How were you feeling before?</label>
+                        <select id="emotional-state">
+                            <option value="good">Good/energized</option>
+                            <option value="neutral">Neutral</option>
+                            <option value="tired">Tired</option>
+                            <option value="stressed">Already stressed</option>
+                            <option value="anxious">Anxious</option>
+                            <option value="sad">Sad/down</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="trigger-description">Describe what happened:</label>
+                    <textarea id="trigger-description" rows="3" placeholder="What exactly triggered you? Be specific about the situation, people involved, and what they said/did..."></textarea>
+                </div>
+                
+                <button class="btn" onclick="logEnhancedTrigger()">Log & Get AI Insights</button>
+            </div>
+
+            <div class="card shadow-work">
+                <h2>Personalized Insights</h2>
+                <div class="jung-quote" id="jung-quote">
+                    "What you deny controls you. What you accept transforms you." - Carl Jung
+                </div>
+                <div id="shadow-insights">
+                    <p><strong>Ever wonder why certain people or situations trigger you so much?</strong></p>
+                    <p>Often, what bothers us most about others is something we haven't accepted about ourselves. This isn't your fault - it's just how our minds work!</p>
+                    <p>Start logging your triggers and I'll help you discover what these moments are trying to teach you about yourself.</p>
+                    <p><em>No psychology degree required - just curiosity about yourself!</em></p>
+                </div>
+
+                <!-- Pattern Insights will appear here -->
+                <div id="pattern-insights-container"></div>
+            </div>
+
+            <div class="card">
+                <h2>AI Dialogue</h2>
+                <div class="ai-chat" id="ai-chat">
+                    <div class="message ai">
+                        <strong>Your Learning Companion:</strong> Hi! I'm here to help you understand why certain things trigger you and turn those moments into opportunities to learn about yourself. When you log something that drained your energy, I'll ask you simple questions to help you discover what's really going on underneath. Think of me as a curious friend who helps you connect the dots.
+                    </div>
+                </div>
+                <div class="input-group" style="margin-top: 16px;">
+                    <textarea id="user-message" rows="2" placeholder="Ask me anything about your triggers, patterns, or just say 'I don't understand' if something doesn't make sense..."></textarea>
+                </div>
+                <button class="btn" onclick="sendMessage()">Send Message</button>
+
+                <!-- Recommended Resources Section -->
+                <div class="resources-section" id="resources-section" style="display: none;">
+                    <h3>🎯 Recommended Just For You</h3>
+                    <div id="resources-container">
+                        <!-- Dynamic resources will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Daily Practices</h2>
+                <div id="practices">
+                    <div class="practice-card">
+                        <h4>Morning Intention</h4>
+                        <p>Set your intention: "Today, I choose to respond rather than react."</p>
+                        <button class="btn" onclick="markPracticeComplete('morning')">Mark Complete</button>
+                    </div>
+                    <div class="practice-card">
+                        <h4>Evening Reflection</h4>
+                        <p>Ask yourself: "Where did I choose consciousness today? What can I learn?"</p>
+                        <button class="btn" onclick="markPracticeComplete('evening')">Mark Complete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Your Enhanced Trigger Patterns</h2>
+            <div id="patterns-summary" style="margin-bottom: 20px;">
+                <!-- Pattern analysis will appear here -->
+            </div>
+            <div class="logs-grid" id="logs-container">
+                <!-- Enhanced logs will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Global State
+        let apiConfig = JSON.parse(localStorage.getItem('apiConfig')) || {};
+        let energyLogs = JSON.parse(localStorage.getItem('energyLogs')) || [];
+        let userProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
+        let learningProfile = JSON.parse(localStorage.getItem('learningProfile')) || {
+            identifiedPatterns: [],
+            personalityInsights: {},
+            aiInteractionHistory: { totalInteractions: 0, helpfulnessRating: 0 }
+        };
+        let conversationHistory = [];
+
+        // Jung quotes for rotation
+        const jungQuotes = [
+            "What you deny controls you. What you accept transforms you.",
+            "He who looks outside dreams; he who looks inside awakens.",
+            "Until you make the unconscious conscious, it will direct your life and you will call it fate.",
+            "You are not your reactions. You are the awareness that can choose how to respond.",
+            "Everything that irritates us about others can lead us to an understanding of ourselves.",
+            "The privilege of a lifetime is to become who you truly are.",
+            "Your perception of me is a reflection of you; my reaction to you is an awareness of me."
+        ];
+
+        // Enhanced initialization
+        function init() {
+            updateEnergyBar();
+            loadLogs();
+            loadApiConfig();
+            checkOnboardingStatus();
+            rotateQuote();
+            analyzePatterns();
+            showWelcomeMessage();
+            setInterval(rotateQuote, 12000);
+        }
+
+        function checkOnboardingStatus() {
+            if (userProfile.name) {
+                document.getElementById('onboarding-section').style.display = 'none';
+                personalizeInterface();
+            }
+        }
+
+        function personalizeInterface() {
+            const userName = userProfile.name;
+            if (userName) {
+                // Update welcome message
+                const welcomeMsg = document.getElementById('welcome-message');
+                welcomeMsg.innerHTML = `<strong>Welcome back, ${userName}!</strong> I've been learning about your patterns and found some interesting insights to share with you.`;
+                
+                // Personalize chat greeting
+                const chatContainer = document.getElementById('ai-chat');
+                const greeting = chatContainer.querySelector('.message.ai');
+                greeting.innerHTML = `<strong>Your Learning Companion:</strong> Hi ${userName}! I'm here to help you understand your triggers and transform them into growth opportunities. Based on what I know about you so far, I'll tailor my insights to your ${userProfile.learningStyle || 'practical'} learning style.`;
+            }
+        }
+
+        function completeOnboarding() {
+            const name = document.getElementById('user-name').value.trim();
+            const age = document.getElementById('user-age').value;
+            const learningStyle = document.getElementById('learning-style').value;
+            const mainChallenge = document.getElementById('main-challenge').value;
+            const goals = document.getElementById('goals').value.trim();
+
+            if (!name) {
+                alert('Please enter your name to continue');
+                return;
+            }
+
+            userProfile = {
+                name,
+                age: age ? parseInt(age) : null,
+                learningStyle,
+                mainChallenge,
+                goals,
+                joinDate: new Date().toISOString(),
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            
+            document.getElementById('onboarding-section').style.display = 'none';
+            personalizeInterface();
+            
+            // Add welcome message to chat
+            addAIMessage(`Great to meet you, ${name}! I understand your main challenge is ${mainChallenge} and you prefer ${learningStyle} learning. I'll keep this in mind as we work together. Start logging your triggers whenever you're ready, and I'll help you discover the patterns underneath! 🌟`);
+        }
+
+        function showWelcomeMessage() {
+            if (userProfile.name && energyLogs.length > 2) {
+                document.getElementById('welcome-message').style.display = 'block';
+            }
+        }
+
+        function rotateQuote() {
+            const quoteElement = document.getElementById('jung-quote');
+            const randomQuote = jungQuotes[Math.floor(Math.random() * jungQuotes.length)];
+            quoteElement.innerHTML = `"${randomQuote}" - Carl Jung`;
+        }
+
+        function updateDrainLabel(value) {
+            document.getElementById('drain-label').textContent = value;
+        }
+
+        function updateEnergyBar() {
+            const today = new Date().toDateString();
+            const todayDrains = energyLogs.filter(log => 
+                new Date(log.timestamp).toDateString() === today
+            );
+            const totalDrain = todayDrains.reduce((sum, log) => sum + (log.drainLevel * 10), 0);
+            const remaining = Math.max(100 - totalDrain, 0);
+            
+            const energyBar = document.getElementById('energy-bar');
+            energyBar.style.width = `${remaining}%`;
+            energyBar.setAttribute('data-energy', remaining);
+            
+            // Change color based on energy level
+            if (remaining > 70) {
+                energyBar.style.background = 'linear-gradient(45deg, #48bb78, #38a169)';
+            } else if (remaining > 40) {
+                energyBar.style.background = 'linear-gradient(45deg, #ed8936, #dd6b20)';
+            } else {
+                energyBar.style.background = 'linear-gradient(45deg, #e53e3e, #c53030)';
+            }
+        }
+
+        function saveApiConfig() {
+            const provider = document.getElementById('api-provider').value;
+            const apiKey = document.getElementById('api-key').value;
+            
+            if (!apiKey) {
+                alert('Please enter an API key');
+                return;
+            }
+
+            apiConfig = { provider, apiKey };
+            localStorage.setItem('apiConfig', JSON.stringify(apiConfig));
+            
+            const statusEl = document.getElementById('api-status');
+            statusEl.textContent = 'Connected';
+            statusEl.className = 'api-status connected';
+            
+            alert('API configuration saved successfully!');
+        }
+
+        function loadApiConfig() {
+            if (apiConfig.provider) {
+                document.getElementById('api-provider').value = apiConfig.provider;
+                const statusEl = document.getElementById('api-status');
+                statusEl.textContent = 'Connected';
+                statusEl.className = 'api-status connected';
+            }
+        }
+
+        async function logEnhancedTrigger() {
+            const type = document.getElementById('trigger-type').value;
+            const description = document.getElementById('trigger-description').value;
+            const drainLevel = parseInt(document.getElementById('drain-level').value);
+            const location = document.getElementById('context-location').value;
+            const emotionalState = document.getElementById('emotional-state').value;
+
+            if (!description.trim()) {
+                alert('Please describe what triggered you');
+                return;
+            }
+
+            const now = new Date();
+            const enhancedLog = {
+                id: Date.now(),
+                type,
+                description,
+                drainLevel,
+                timestamp: now.toISOString(),
+                
+                // Enhanced context data
+                context: {
+                    timeOfDay: now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    dayOfWeek: now.toLocaleDateString('en-US', { weekday: 'long' }),
+                    location,
+                    emotionalState,
+                    userId: userProfile.name || 'Anonymous'
+                },
+                
+                // Learning tracking (to be filled by AI interaction)
+                learning: {
+                    aiInsightGiven: null,
+                    userResponseToInsight: null,
+                    actionTaken: null,
+                    outcomeRating: null,
+                    recoveryTime: null,
+                    recoveryMethod: null
+                }
+            };
+
+            energyLogs.unshift(enhancedLog);
+            localStorage.setItem('energyLogs', JSON.stringify(energyLogs));
+            
+            updateEnergyBar();
+            loadLogs();
+            analyzePatterns();
+            
+            // Clear form
+            document.getElementById('trigger-description').value = '';
+            document.getElementById('drain-level').value = 5;
+            updateDrainLabel(5);
+
+            // Get enhanced AI insights
+            await getEnhancedAIInsights(enhancedLog);
+        }
+
+        async function getEnhancedAIInsights(log) {
+            if (!apiConfig.apiKey) {
+                addAIMessage("Please configure your API key first to receive personalized insights.");
+                return;
+            }
+
+            try {
+                addAIMessage("Analyzing your trigger with enhanced context... 🤔");
+                
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const isFirstLog = energyLogs.length === 1;
+                if (isFirstLog) {
+                    addAIMessage(`${userProfile.name || 'Friend'}, here's something interesting about your trigger. Since you're just starting, I'll explain things step by step in your preferred ${userProfile.learningStyle || 'practical'} style!`);
+                }
+                
+                const mockResponse = generateEnhancedInsight(log);
+                addAIMessage(mockResponse);
+                
+                // Add pattern-specific insights
+                setTimeout(() => {
+                    const patternInsight = generatePatternInsight(log);
+                    if (patternInsight) {
+                        addAIMessage(patternInsight);
+                    }
+                }, 2000);
+
+                // Generate and show resources
+                setTimeout(() => {
+                    generatePersonalizedResources(log);
+                }, 3000);
+                
+                // Add follow-up questions
+                setTimeout(() => {
+                    const followUp = generateEnhancedFollowUp(log);
+                    addAIMessage(followUp);
+                }, 4000);
+                
+            } catch (error) {
+                addAIMessage("Sorry, I couldn't analyze your trigger right now. Try again later.");
+            }
+        }
+
+        function generateEnhancedInsight(log) {
+            const userName = userProfile.name || 'friend';
+            const timeContext = getTimeContext(log.context.timeOfDay);
+            const locationContext = log.context.location;
+            const emotionalContext = log.context.emotionalState;
+            
+            const contextualInsights = {
+                conversation: `${userName}, I notice this conversation happened ${timeContext} at ${locationContext} when you were already feeling ${emotionalContext}. Here's what's fascinating: draining conversations often mirror our internal conflicts. The specific way this person triggered you might be showing you an aspect of yourself that needs attention. What did their behavior remind you of?`,
+                
+                thought: `${userName}, those obsessive thoughts at ${timeContext} - especially when you were ${emotionalContext} - are your unconscious trying to process something important. Jung believed repetitive thoughts point to unintegrated shadow material. Since your main challenge is ${userProfile.mainChallenge || 'emotional regulation'}, this pattern might be connected to that deeper theme.`,
+                
+                situation: `${userName}, this ${locationContext} situation at ${timeContext} reveals something about your stress response patterns. When you were already ${emotionalContext}, this trigger exposed where you still react automatically. This is actually valuable data about your growth edge!`,
+                
+                reaction: `${userName}, that emotional surge at ${timeContext} - particularly since you were ${emotionalState} beforehand - is your body's wisdom speaking. Strong reactions often point to old wounds seeking healing. Given your goal around ${userProfile.mainChallenge || 'emotional growth'}, this is exactly the kind of moment that can transform you.`
+            };
+            
+            return contextualInsights[log.type] || `${userName}, this trigger is revealing something important about your inner landscape. Let's explore what it's trying to teach you.`;
+        }
+
+        function getTimeContext(time) {
+            const hour = parseInt(time.split(':')[0]);
+            if (hour < 6) return "very early morning";
+            if (hour < 12) return "in the morning";
+            if (hour < 14) return "around midday";
+            if (hour < 18) return "in the afternoon";
+            if (hour < 21) return "in the evening";
+            return "late at night";
+        }
+
+        function generatePatternInsight(currentLog) {
+            if (energyLogs.length < 3) return null;
+            
+            const recentLogs = energyLogs.slice(0, 5);
+            const patterns = analyzeRecentPatterns(recentLogs);
+            
+            if (patterns.commonLocation) {
+                return `🔍 Pattern Alert: I'm noticing that ${patterns.commonLocation} seems to be a frequent trigger location for you. This might be worth exploring - what is it about that environment that affects your energy?`;
+            }
+            
+            if (patterns.timePattern) {
+                return `⏰ Timing Pattern: Your triggers often happen ${patterns.timePattern}. This could be related to natural energy cycles or accumulated stress. Consider what's different about your energy at these times.`;
+            }
+            
+            if (patterns.emotionalPattern) {
+                return `💭 Emotional Pattern: I notice you're often feeling ${patterns.emotionalPattern} before triggers occur. This suggests your emotional baseline might be affecting your resilience. What helps you feel more centered?`;
+            }
+            
+            return null;
+        }
+
+        function analyzeRecentPatterns(logs) {
+            const locations = logs.map(log => log.context?.location).filter(Boolean);
+            const emotions = logs.map(log => log.context?.emotionalState).filter(Boolean);
+            const times = logs.map(log => log.context?.timeOfDay).filter(Boolean);
+            
+            return {
+                commonLocation: getMostCommon(locations),
+                emotionalPattern: getMostCommon(emotions),
+                timePattern: analyzeTimePattern(times)
+            };
+        }
+
+        function getMostCommon(arr) {
+            if (arr.length === 0) return null;
+            const frequency = {};
+            arr.forEach(item => frequency[item] = (frequency[item] || 0) + 1);
+            const maxCount = Math.max(...Object.values(frequency));
+            return maxCount > 1 ? Object.keys(frequency).find(key => frequency[key] === maxCount) : null;
+        }
+
+        function analyzeTimePattern(times) {
+            if (times.length < 2) return null;
+            const afternoonEvening = times.filter(time => {
+                const hour = parseInt(time.split(':')[0]);
+                return hour >= 14 && hour <= 20;
+            });
+            return afternoonEvening.length >= times.length * 0.7 ? "in the afternoon/evening" : null;
+        }
+
+        function generatePersonalizedResources(log) {
+            const resourcesContainer = document.getElementById('resources-container');
+            const resourcesSection = document.getElementById('resources-section');
+            
+            const resources = getResourcesForTrigger(log.type, userProfile.mainChallenge, userProfile.learningStyle);
+            
+            if (resources.length > 0) {
+                resourcesContainer.innerHTML = '';
+                resources.forEach(resource => {
+                    const resourceDiv = document.createElement('div');
+                    resourceDiv.className = 'resource-item';
+                    resourceDiv.innerHTML = `
+                        <div class="resource-type">${resource.type}</div>
+                        <h4>${resource.title}</h4>
+                        <p>${resource.description}</p>
+                        <small>⏱️ ${resource.duration} • 📊 ${resource.difficulty}</small>
+                    `;
+                    resourcesContainer.appendChild(resourceDiv);
+                });
+                resourcesSection.style.display = 'block';
+            }
+        }
+
+        function getResourcesForTrigger(triggerType, mainChallenge, learningStyle) {
+            const resourceLibrary = {
+                conversation: [
+                    {
+                        type: "Exercise",
+                        title: "The Mirror Question Technique",
+                        description: "When someone triggers you, ask: 'What quality in them am I not accepting in myself?' This Jung-inspired practice transforms conflicts into self-discovery.",
+                        duration: "2 minutes",
+                        difficulty: "Beginner"
+                    },
+                    {
+                        type: "Video",
+                        title: "Shadow Work for Difficult Conversations",
+                        description: "A guided exploration of how our unconscious projections create relationship conflicts.",
+                        duration: "12 minutes",
+                        difficulty: "Intermediate"
+                    }
+                ],
+                thought: [
+                    {
+                        type: "Technique",
+                        title: "The Thought Labeling Practice",
+                        description: "Name your obsessive thoughts: 'I'm having the thought that...' This creates distance between you and the thought.",
+                        duration: "5 minutes",
+                        difficulty: "Beginner"
+                    },
+                    {
+                        type: "Journal",
+                        title: "Jung's Active Imagination for Anxiety",
+                        description: "Dialogue with your anxious thoughts as if they were separate entities. What are they trying to protect?",
+                        duration: "15 minutes",
+                        difficulty: "Advanced"
+                    }
+                ],
+                situation: [
+                    {
+                        type: "Meditation",
+                        title: "The Sacred Pause Practice",
+                        description: "A 3-breath technique to create space between trigger and response, based on Jung's concept of holding tension.",
+                        duration: "3 minutes",
+                        difficulty: "Beginner"
+                    }
+                ],
+                reaction: [
+                    {
+                        type: "Exercise",
+                        title: "Emotion as Messenger",
+                        description: "Jung believed emotions carry messages from the unconscious. Ask your feeling: 'What are you trying to tell me?'",
+                        duration: "5 minutes",
+                        difficulty: "Beginner"
+                    }
+                ]
+            };
+
+            return resourceLibrary[triggerType] || [];
+        }
+
+        function generateEnhancedFollowUp(log) {
+            const userName = userProfile.name || 'friend';
+            const questions = [
+                `${userName}, thinking about your ${userProfile.mainChallenge || 'main challenge'} - how might this trigger connect to that deeper pattern?`,
+                `${userName}, if this situation was your teacher, what might it be trying to show you about your growth edge?`,
+                `${userName}, what would responding from your highest self look like in this situation?`,
+                `${userName}, considering your goal of ${userProfile.goals || 'emotional growth'}, what small shift could you make next time?`
+            ];
+            
+            return "🤔 Let's go deeper: " + questions[Math.floor(Math.random() * questions.length)];
+        }
+
+        function analyzePatterns() {
+            if (energyLogs.length < 3) return;
+            
+            const patterns = identifyTriggerPatterns();
+            displayPatternSummary(patterns);
+        }
+
+        function identifyTriggerPatterns() {
+            const recentLogs = energyLogs.slice(0, 10);
+            
+            // Analyze frequency by type
+            const typeFrequency = {};
+            recentLogs.forEach(log => {
+                typeFrequency[log.type] = (typeFrequency[log.type] || 0) + 1;
+            });
+            
+            // Analyze average intensity
+            const avgIntensity = recentLogs.reduce((sum, log) => sum + log.drainLevel, 0) / recentLogs.length;
+            
+            // Find peak trigger times
+            const timePatterns = recentLogs.map(log => log.context?.timeOfDay).filter(Boolean);
+            
+            return {
+                primaryTrigger: Object.keys(typeFrequency).reduce((a, b) => typeFrequency[a] > typeFrequency[b] ? a : b),
+                frequency: typeFrequency,
+                avgIntensity: Math.round(avgIntensity * 10) / 10,
+                totalTriggers: recentLogs.length,
+                improvementTrend: calculateImprovementTrend(recentLogs)
+            };
+        }
+
+        function calculateImprovementTrend(logs) {
+            if (logs.length < 5) return null;
+            
+            const recent = logs.slice(0, 3).reduce((sum, log) => sum + log.drainLevel, 0) / 3;
+            const older = logs.slice(-3).reduce((sum, log) => sum + log.drainLevel, 0) / 3;
+            
+            const improvement = older - recent;
+            if (improvement > 0.5) return "improving";
+            if (improvement < -0.5) return "increasing";
+            return "stable";
+        }
+
+        function displayPatternSummary(patterns) {
+            const container = document.getElementById('patterns-summary');
+            const userName = userProfile.name || 'friend';
+            
+            let trendMessage = "";
+            if (patterns.improvementTrend === "improving") {
+                trendMessage = `<div class="pattern-insight">🎉 Great news, ${userName}! Your trigger intensity is decreasing over time. You're making real progress!</div>`;
+            } else if (patterns.improvementTrend === "increasing") {
+                trendMessage = `<div class="pattern-insight">💙 ${userName}, I notice your triggers have been more intense lately. This might be a sign to focus extra attention on self-care.</div>`;
+            }
+            
+            container.innerHTML = `
+                <h3>Your Pattern Analysis</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0;">
+                    <div style="background: #e6f3ff; padding: 15px; border-radius: 8px;">
+                        <strong>Primary Trigger</strong><br>
+                        ${patterns.primaryTrigger.charAt(0).toUpperCase() + patterns.primaryTrigger.slice(1)}
+                    </div>
+                    <div style="background: #f0f8ff; padding: 15px; border-radius: 8px;">
+                        <strong>Avg Intensity</strong><br>
+                        ${patterns.avgIntensity}/10
+                    </div>
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px;">
+                        <strong>Recent Triggers</strong><br>
+                        ${patterns.totalTriggers} logged
+                    </div>
+                </div>
+                ${trendMessage}
+            `;
+        }
+
+        function addAIMessage(message) {
+            const chatContainer = document.getElementById('ai-chat');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ai';
+            messageDiv.innerHTML = `<strong>Your Learning Companion:</strong> ${message}`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function addUserMessage(message) {
+            const chatContainer = document.getElementById('ai-chat');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            messageDiv.innerHTML = `<strong>You:</strong> ${message}`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const messageInput = document.getElementById('user-message');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            addUserMessage(message);
+            messageInput.value = '';
+            
+            // Enhanced response system with personalization
+            const userName = userProfile.name || 'friend';
+            
+            // Check for confusion and provide explanations
+            if (message.toLowerCase().includes('don\'t understand') || 
+                message.toLowerCase().includes('confused') ||
+                message.toLowerCase().includes('what do you mean')) {
+                setTimeout(() => {
+                    addAIMessage(`No worries, ${userName}! Let me explain it differently using ${userProfile.learningStyle || 'practical'} examples. Think of triggers like mirrors - when someone really annoys you, it's often because they're doing something you secretly worry you do too. It's like looking in a reflection - what you see in them might actually be showing you something about yourself. Does that make more sense?`);
+                }, 1000);
+                return;
+            }
+            
+            // Enhanced action-oriented responses
+            if (message.toLowerCase().includes('what can i do') || 
+                message.toLowerCase().includes('how do i') ||
+                message.toLowerCase().includes('what should i') ||
+                message.toLowerCase().includes('help me')) {
+                
+                const recentLog = energyLogs[0];
+                let actionableResponse = getPersonalizedActionAdvice(recentLog, userProfile);
+                
+                setTimeout(() => {
+                    addAIMessage(actionableResponse);
+                }, 1000);
+                return;
+            }
+            
+            // Context-aware responses
+            setTimeout(() => {
+                const contextualResponse = generateContextualResponse(message, userProfile, energyLogs[0]);
+                addAIMessage(contextualResponse);
+            }, 1000);
+        }
+
+        function getPersonalizedActionAdvice(recentLog, profile) {
+            const userName = profile.name || 'friend';
+            const learningStyle = profile.learningStyle || 'practical';
+            
+            if (!recentLog) {
+                return `${userName}, here are 3 immediate steps tailored to your ${learningStyle} learning style: 1) Start the enhanced energy audit - notice patterns in when/where triggers happen, 2) Practice the "sacred pause" - count to 3 before responding to anything that activates you, 3) Ask yourself Jung's key question: "What is this situation trying to teach me about myself?" These build your awareness muscle over time.`;
+            }
+            
+            const typeAdvice = {
+                conversation: `${userName}, here's what you can try right now: Next time you're in a draining conversation, use the "strategic pause" - say "Let me think about that and get back to you." This honors your ${learningStyle} style by giving you time to process. Also, try Jung's mirror question: "What quality in them am I not accepting in myself?" This transforms conflicts into self-discovery.`,
+                
+                thought: `${userName}, for those obsessive thoughts, try this 3-step process that works well with ${learningStyle} learning: 1) Name the thought: "I'm having the thought that..." 2) Ask: "What is this thought trying to protect me from?" 3) Write it down for 5 minutes without editing. This gets it out of your head and onto paper where you can examine it objectively.`,
+                
+                situation: `${userName}, here's a practical tool for stressful situations: Before entering challenging environments (especially ${recentLog.context?.location}), take 3 deep breaths and visualize yourself staying calm. Picture yourself breathing slowly, speaking clearly, and maintaining your center. This "mental rehearsal" trains your nervous system to respond differently.`,
+                
+                reaction: `${userName}, when you feel that emotional surge, try the "STOP" technique: S-top what you're doing, T-ake a breath, O-bserve what you're feeling, P-roceed with intention. Right now, place your hand on your heart and say "This feeling is valid, and I can choose how to respond to it." This self-compassion practice shifts your entire nervous system.`
+            };
+            
+            return typeAdvice[recentLog?.type] || `${userName}, based on your recent patterns, focus on the fundamentals: breathe consciously, pause before reacting, and ask what each trigger is teaching you about yourself.`;
+        }
+
+        function generateContextualResponse(message, profile, recentLog) {
+            const userName = profile.name || 'friend';
+            const responses = [
+                `That's a really insightful observation, ${userName}. Noticing these patterns is exactly how transformation begins.`,
+                `${userName}, what you're describing connects to Jung's work on shadow projection. Sometimes we get upset with others because they mirror something we haven't accepted in ourselves.`,
+                `${userName}, this sounds like exactly the kind of situation Jung would call "meaningful" - it's trying to teach you something important about your ${profile.mainChallenge || 'growth edge'}.`,
+                `I hear you, ${userName}. Given your goal around ${profile.goals || 'emotional growth'}, how might accepting this difficult feeling help you move forward?`
+            ];
+            
+            if (recentLog) {
+                responses.push(`${userName}, I notice your recent ${recentLog.type} trigger. These patterns often connect to deeper themes in our lives. What do you think this situation might be reflecting about your inner world?`);
+                responses.push(`Based on your recent logs, ${userName}, I'm seeing some interesting patterns around ${recentLog.context?.location || 'certain environments'}. Would you like me to help you explore what these triggers might have in common?`);
+            }
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function loadLogs() {
+            const container = document.getElementById('logs-container');
+            container.innerHTML = '';
+            
+            energyLogs.slice(0, 10).forEach(log => {
+                const logDiv = document.createElement('div');
+                logDiv.className = 'log-entry';
+                logDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${log.type.charAt(0).toUpperCase() + log.type.slice(1)}</strong>
+                            <span style="margin-left: 10px; color: #666;">Drain: ${log.drainLevel}/10</span>
+                        </div>
+                        <small>${new Date(log.timestamp).toLocaleDateString()}</small>
+                    </div>
+                    <p style="margin-top: 8px;">${log.description}</p>
+                    ${log.context ? `
+                        <div class="context-info">
+                            📍 ${log.context.location} • ⏰ ${log.context.timeOfDay} • 💭 Feeling ${log.context.emotionalState}
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(logDiv);
+            });
+        }
+
+        function markPracticeComplete(practice) {
+            const today = new Date().toDateString();
+            const completedPractices = JSON.parse(localStorage.getItem('completedPractices')) || {};
+            
+            if (!completedPractices[today]) {
+                completedPractices[today] = [];
+            }
+            
+            if (!completedPractices[today].includes(practice)) {
+                completedPractices[today].push(practice);
+                localStorage.setItem('completedPractices', JSON.stringify(completedPractices));
+                
+                const userName = userProfile.name || 'friend';
+                addAIMessage(`Great job completing your ${practice} practice, ${userName}! Building these small daily habits is how real transformation happens. 🌟`);
+            }
+        }
+
+        // Handle Enter key in message input
+        document.getElementById('user-message').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Initialize app when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
