@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jung's Therapeutic AI Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+            margin-bottom: 300px; /* Space for debug console */
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header h1 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .alert {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        .alert.warning {
+            background: linear-gradient(45deg, #feca57, #ff9ff3);
+            color: #333;
+        }
+
+        .alert.success {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .secondary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            grid-column: span 2;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .crisis-card {
+            border: 3px solid #ff6b6b;
+            background: linear-gradient(135deg, #ffe0e0, #ffcccc);
+        }
+
+        .energy-visual {
+            background: #f0f4f8;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .energy-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            transition: all 1s ease;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .energy-bar::after {
+            content: attr(data-energy) '%';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #feca57, #ff9ff3);
+            color: #333;
+        }
+
+        .enhanced-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .enhanced-form .full-width {
+            grid-column: span 2;
+        }
+
+        .pattern-insight {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c8);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #48bb78;
+        }
+
+        .crisis-insight {
+            background: linear-gradient(135deg, #ffe0e0, #ffcccc);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .skill-module {
+            background: linear-gradient(135deg, #e6f3ff, #f0f8ff);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .log-entry {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin: 10px 0;
+            animation: slideIn 0.3s ease;
+        }
+
+        .log-entry.high-risk {
+            border-left-color: #ff6b6b;
+            background: linear-gradient(135deg, #ffe0e0, #fff0f0);
+        }
+
+        .context-info {
+            background: #e2e8f0;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #4a5568;
+        }
+
+        .export-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .therapeutic-goals {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+
+        .goal-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .goal-progress {
+            width: 100px;
+            height: 8px;
+            background: #f0f4f8;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .goal-progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            transition: width 0.3s ease;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-controls select {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* DEBUG CONSOLE STYLES */
+        .debug-console {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 250px;
+            background: #1a1a1a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border-top: 3px solid #333;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .debug-header {
+            background: #333;
+            color: #fff;
+            padding: 8px 12px;
+            margin: -10px -10px 10px -10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #555;
+        }
+
+        .debug-content {
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        .debug-error {
+            color: #ff6b6b;
+        }
+
+        .debug-warning {
+            color: #feca57;
+        }
+
+        .debug-success {
+            color: #48bb78;
+        }
+
+        .debug-info {
+            color: #4facfe;
+        }
+
+        .debug-toggle {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .debug-section {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 3px solid #555;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .debug-collapsed {
+            height: 40px;
+            overflow: hidden;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .secondary-grid {
+                grid-template-columns: 1fr;
+                grid-column: span 1;
+            }
+            .enhanced-form {
+                grid-template-columns: 1fr;
+            }
+            .enhanced-form .full-width {
+                grid-column: span 1;
+            }
+            .export-options {
+                grid-template-columns: 1fr;
+            }
+            .filter-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Jung's Therapeutic AI Companion</h1>
+            <p>Professional-grade trigger tracking and pattern analysis for therapeutic collaboration</p>
+            <div id="system-status" style="margin-top: 15px; padding: 10px; background: rgba(72, 187, 120, 0.1); border-radius: 8px; color: #2d5534;">
+                ⚠️ System Starting - Running Diagnostics...
+            </div>
+        </div>
+
+        <!-- Crisis Alert System -->
+        <div class="alert" id="crisis-alert">
+            <strong>⚠️ Pattern Alert:</strong> Your recent triggers suggest you might benefit from immediate professional support.
+        </div>
+
+        <div class="alert success" id="progress-alert" style="display: none;">
+            <strong>🎉 Progress Detected:</strong> Your trigger intensity has decreased. Excellent work!
+        </div>
+
+        <div class="main-grid">
+            <!-- Enhanced Trigger Logger -->
+            <div class="card">
+                <h2>📊 Professional Trigger Documentation</h2>
+                <div class="energy-visual">
+                    <div class="energy-bar" id="energy-bar" data-energy="100" style="width: 100%"></div>
+                </div>
+                
+                <div class="enhanced-form">
+                    <div class="input-group">
+                        <label for="trigger-type">Trigger Category</label>
+                        <select id="trigger-type">
+                            <option value="interpersonal">Interpersonal Conflict</option>
+                            <option value="cognitive">Obsessive Thoughts</option>
+                            <option value="environmental">Environmental Stress</option>
+                            <option value="somatic">Physical/Body Reaction</option>
+                            <option value="memory">Memory/Flashback</option>
+                            <option value="abandonment">Abandonment Fear</option>
+                            <option value="criticism">Criticism/Judgment</option>
+                            <option value="control">Loss of Control</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="intensity-level">Intensity (1-10)</label>
+                        <input type="range" id="intensity-level" min="1" max="10" value="5" oninput="updateIntensityLabel(this.value)">
+                        <span id="intensity-label">5 - Moderate</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="duration">Duration</label>
+                        <select id="duration">
+                            <option value="minutes">Minutes (5-30)</option>
+                            <option value="hours">Hours (1-6)</option>
+                            <option value="half-day">Half Day (6-12 hours)</option>
+                            <option value="full-day">Full Day (12+ hours)</option>
+                            <option value="multiple-days">Multiple Days</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="context-location">Location</label>
+                        <select id="context-location">
+                            <option value="home">Home</option>
+                            <option value="work">Work</option>
+                            <option value="social">Social Setting</option>
+                            <option value="therapy">Therapy Session</option>
+                            <option value="medical">Medical Setting</option>
+                            <option value="public">Public Space</option>
+                            <option value="online">Online/Digital</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="emotional-state">Pre-trigger State</label>
+                        <select id="emotional-state">
+                            <option value="stable">Stable/Baseline</option>
+                            <option value="elevated">Already Stressed</option>
+                            <option value="depressed">Depressed/Low</option>
+                            <option value="anxious">Anxious</option>
+                            <option value="tired">Fatigued</option>
+                            <option value="triggered">Already Triggered</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="physical-symptoms">Physical Symptoms</label>
+                        <select id="physical-symptoms" multiple>
+                            <option value="racing-heart">Racing Heart</option>
+                            <option value="sweating">Sweating</option>
+                            <option value="tension">Muscle Tension</option>
+                            <option value="nausea">Nausea</option>
+                            <option value="headache">Headache</option>
+                            <option value="fatigue">Fatigue</option>
+                            <option value="dissociation">Dissociation</option>
+                            <option value="hypervigilance">Hypervigilance</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="trigger-description">Detailed Description</label>
+                    <textarea id="trigger-description" rows="4" placeholder="Describe the trigger event, your thoughts, feelings, and reactions in detail. Include what happened before, during, and after..."></textarea>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="coping-used">Coping Strategies Used</label>
+                    <textarea id="coping-used" rows="2" placeholder="What did you try to cope? (breathing, medication, self-talk, calling someone, etc.)"></textarea>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="effectiveness">Coping Effectiveness (1-10)</label>
+                    <input type="range" id="effectiveness" min="1" max="10" value="5" oninput="updateEffectivenessLabel(this.value)">
+                    <span id="effectiveness-label">5 - Somewhat Helpful</span>
+                </div>
+
+                <button class="btn" onclick="logTherapeuticTrigger()">📝 Log Professional Entry</button>
+            </div>
+
+            <!-- Crisis Detection & Professional Alerts -->
+            <div class="card crisis-card" id="crisis-card" style="display: none;">
+                <h2>🚨 Professional Alert System</h2>
+                <div id="crisis-content">
+                    <div class="crisis-insight">
+                        <h4>High-Risk Pattern Detected</h4>
+                        <p id="crisis-message">Your recent entries suggest escalating distress.</p>
+                    </div>
+                    <button class="btn btn-danger" onclick="exportCrisisReport()">📤 Export Crisis Report</button>
+                    <button class="btn btn-warning" onclick="accessCrisisResources()">📞 Access Crisis Resources</button>
+                </div>
+            </div>
+
+            <!-- Professional Data Export -->
+            <div class="card">
+                <h2>📋 Professional Reports</h2>
+                <div class="export-options">
+                    <button class="btn" onclick="exportTherapistReport()">📄 Therapist Report</button>
+                    <button class="btn" onclick="exportDataCSV()">📊 Raw Data (CSV)</button>
+                    <button class="btn" onclick="exportProgressReport()">📈 Progress Report</button>
+                </div>
+                
+                <div class="therapeutic-goals">
+                    <h3>Therapeutic Goals Tracking</h3>
+                    <div id="goals-container">
+                        <div class="goal-item">
+                            <span>Reduce trigger intensity</span>
+                            <div class="goal-progress">
+                                <div class="goal-progress-bar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <span>Increase coping effectiveness</span>
+                            <div class="goal-progress">
+                                <div class="goal-progress-bar" style="width: 40%"></div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <span>Extend time between triggers</span>
+                            <div class="goal-progress">
+                                <div class="goal-progress-bar" style="width: 25%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="addTherapeuticGoal()">+ Add Goal</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="secondary-grid">
+            <!-- Real-time Pattern Analysis -->
+            <div class="card">
+                <h2>🔍 Clinical Pattern Analysis</h2>
+                <div id="pattern-analysis">
+                    <div class="chart-placeholder" id="frequency-chart">
+                        📈 Chart will update with your data
+                    </div>
+                    <div class="chart-placeholder" id="intensity-chart">
+                        📊 Chart will update with your data
+                    </div>
+                </div>
+                <div id="clinical-insights"></div>
+            </div>
+
+            <!-- Therapeutic Skill Modules -->
+            <div class="card">
+                <h2>🎯 Therapeutic Skill Practice</h2>
+                <div id="skill-modules">
+                    <div class="skill-module">
+                        <h4>5-4-3-2-1 Grounding Technique</h4>
+                        <p>Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste.</p>
+                        <button class="btn" onclick="startGroundingExercise()">Start Exercise</button>
+                    </div>
+
+                    <div class="skill-module">
+                        <h4>4-7-8 Breathing Exercise</h4>
+                        <p>Inhale for 4, hold for 7, exhale for 8. Repeat 4 cycles.</p>
+                        <button class="btn" onclick="startBreathingExercise()">Start Breathing</button>
+                    </div>
+
+                    <div class="skill-module">
+                        <h4>Cognitive Reframing</h4>
+                        <p>Challenge negative thought patterns with evidence-based thinking.</p>
+                        <button class="btn" onclick="startReframingExercise()">Practice Reframing</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crisis Resources -->
+            <div class="card">
+                <h2>🆘 Crisis Resources</h2>
+                <div id="crisis-resources">
+                    <div class="pattern-insight">
+                        <strong>Immediate Support:</strong><br>
+                        • National Crisis Text Line: Text HOME to 741741<br>
+                        • National Suicide Prevention Lifeline: 988<br>
+                        • Crisis Chat: <a href="https://suicidepreventionlifeline.org/chat/" target="_blank">Online Chat</a>
+                    </div>
+                    <div class="input-group">
+                        <label>Your Therapist Contact:</label>
+                        <input type="text" id="therapist-contact" placeholder="Phone number or emergency contact">
+                    </div>
+                    <div class="input-group">
+                        <label>Trusted Emergency Contact:</label>
+                        <input type="text" id="emergency-contact" placeholder="Friend/family member">
+                    </div>
+                    <button class="btn btn-success" onclick="saveEmergencyContacts()">💾 Save Contacts</button>
+                </div>
+            </div>
+
+            <!-- Progress Tracking -->
+            <div class="card">
+                <h2>📈 Progress Analysis</h2>
+                <div id="progress-summary">
+                    <div class="pattern-insight">
+                        <strong>This Week:</strong><br>
+                        • Average Intensity: <span id="week-intensity">--</span><br>
+                        • Trigger Frequency: <span id="week-frequency">-- episodes</span><br>
+                        • Coping Effectiveness: <span id="week-coping">--</span>
+                    </div>
+                </div>
+                <button class="btn" onclick="generateProgressInsights()">🔍 Analyze Patterns</button>
+            </div>
+        </div>
+
+        <!-- Professional Trigger Log Display -->
+        <div class="card">
+            <h2>📋 Professional Trigger Documentation</h2>
+            <div class="filter-controls">
+                <select id="filter-timeframe">
+                    <option value="all">All Time</option>
+                    <option value="week">Past Week</option>
+                    <option value="month">Past Month</option>
+                    <option value="quarter">Past 3 Months</option>
+                </select>
+                <select id="filter-intensity">
+                    <option value="all">All Intensities</option>
+                    <option value="high">High Risk (8-10)</option>
+                    <option value="medium">Medium (5-7)</option>
+                    <option value="low">Low (1-4)</option>
+                </select>
+                <button class="btn" onclick="filterProfessionalLogs()">Apply Filters</button>
+                <button class="btn" onclick="runDiagnostics()">🔧 Run Diagnostics</button>
+            </div>
+            <div id="professional-logs"></div>
+        </div>
+    </div>
+
+    <!-- DEBUG CONSOLE -->
+    <div class="debug-console" id="debug-console">
+        <div class="debug-header">
+            <div>
+                <span>🔧 System Diagnostics Console</span>
+                <span style="margin-left: 20px; font-size: 10px;">Jung's Therapeutic AI Companion v1.0</span>
+            </div>
+            <div>
+                <button class="debug-toggle" onclick="toggleDebugConsole()">Toggle</button>
+                <button class="debug-toggle" onclick="clearDebugConsole()">Clear</button>
+                <button class="debug-toggle" onclick="runDiagnostics()">Re-run Diagnostics</button>
+            </div>
+        </div>
+        <div class="debug-content" id="debug-content">
+            <div class="debug-info">Initializing diagnostic system...</div>
+        </div>
+    </div>
+
+    <script>
+        // DIAGNOSTIC SYSTEM
+        class DiagnosticSystem {
+            constructor() {
+                this.reports = [];
+                this.startTime = Date.now();
+                this.console = document.getElementById('debug-content');
+                this.collapsed = false;
+            }
+
+            log(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const className = `debug-${type}`;
+                const entry = `[${timestamp}] ${message}`;
+                
+                this.reports.push({ timestamp, message, type });
+                
+                const div = document.createElement('div');
+                div.className = className;
+                div.textContent = entry;
+                this.console.appendChild(div);
+                this.console.scrollTop = this.console.scrollHeight;
+            }
+
+            runFullDiagnostics() {
+                this.log('=== STARTING FULL SYSTEM DIAGNOSTICS ===', 'info');
+                
+                // Test 1: Core System Functions
+                this.testCoreFunctions();
+                
+                // Test 2: DOM Elements
+                this.testDOMElements();
+                
+                // Test 3: LocalStorage Operations
+                this.testLocalStorage();
+                
+                // Test 4: Data Integrity
+                this.testDataIntegrity();
+                
+                // Test 5: Event Handlers
+                this.testEventHandlers();
+                
+                // Test 6: Application State
+                this.testApplicationState();
+                
+                // Test 7: Function Dependencies
+                this.testFunctionDependencies();
+                
+                const endTime = Date.now();
+                this.log(`=== DIAGNOSTICS COMPLETE (${endTime - this.startTime}ms) ===`, 'success');
+                this.generateSummaryReport();
+            }
+
+            testCoreFunctions() {
+                this.log('Testing Core Functions...', 'info');
+                
+                const coreFunctions = [
+                    'init',
+                    'logTherapeuticTrigger',
+                    'updateIntensityLabel',
+                    'updateEffectivenessLabel',
+                    'assessRiskLevel',
+                    'checkCrisisConditions',
+                    'analyzePatterns',
+                    'filterProfessionalLogs',
+                    'exportTherapistReport',
+                    'exportDataCSV',
+                    'saveEmergencyContacts',
+                    'loadEmergencyContacts',
+                    'updateEnergyBar',
+                    'generateProfessionalInsights'
+                ];
+
+                coreFunctions.forEach(funcName => {
+                    if (typeof window[funcName] === 'function') {
+                        this.log(`✓ ${funcName} - DEFINED`, 'success');
+                    } else {
+                        this.log(`✗ ${funcName} - MISSING`, 'error');
+                    }
+                });
+            }
+
+            testDOMElements() {
+                this.log('Testing DOM Elements...', 'info');
+                
+                const requiredElements = [
+                    'trigger-type',
+                    'intensity-level',
+                    'intensity-label',
+                    'duration',
+                    'context-location',
+                    'emotional-state',
+                    'physical-symptoms',
+                    'trigger-description',
+                    'coping-used',
+                    'effectiveness',
+                    'effectiveness-label',
+                    'energy-bar',
+                    'crisis-card',
+                    'crisis-message',
+                    'professional-logs',
+                    'clinical-insights',
+                    'therapist-contact',
+                    'emergency-contact',
+                    'system-status'
+                ];
+
+                requiredElements.forEach(elementId => {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        this.log(`✓ Element #${elementId} - FOUND`, 'success');
+                    } else {
+                        this.log(`✗ Element #${elementId} - MISSING`, 'error');
+                    }
+                });
+            }
+
+            testLocalStorage() {
+                this.log('Testing LocalStorage Operations...', 'info');
+                
+                try {
+                    // Test write
+                    localStorage.setItem('diagnostic-test', 'test-value');
+                    this.log('✓ LocalStorage Write - OK', 'success');
+                    
+                    // Test read
+                    const value = localStorage.getItem('diagnostic-test');
+                    if (value === 'test-value') {
+                        this.log('✓ LocalStorage Read - OK', 'success');
+                    } else {
+                        this.log('✗ LocalStorage Read - FAILED', 'error');
+                    }
+                    
+                    // Test JSON operations
+                    const testObj = { test: true, timestamp: Date.now() };
+                    localStorage.setItem('diagnostic-json', JSON.stringify(testObj));
+                    const parsed = JSON.parse(localStorage.getItem('diagnostic-json'));
+                    
+                    if (parsed.test === true) {
+                        this.log('✓ LocalStorage JSON - OK', 'success');
+                    } else {
+                        this.log('✗ LocalStorage JSON - FAILED', 'error');
+                    }
+                    
+                    // Cleanup
+                    localStorage.removeItem('diagnostic-test');
+                    localStorage.removeItem('diagnostic-json');
+                    
+                } catch (error) {
+                    this.log(`✗ LocalStorage Error: ${error.message}`, 'error');
+                }
+            }
+
+            testDataIntegrity() {
+                this.log('Testing Data Integrity...', 'info');
+                
+                try {
+                    // Test therapeuticData structure
+                    if (typeof therapeuticData !== 'undefined') {
+                        this.log('✓ therapeuticData - DEFINED', 'success');
+                        
+                        const requiredProps = ['triggers', 'goals', 'skills', 'emergencyContacts'];
+                        requiredProps.forEach(prop => {
+                            if (therapeuticData.hasOwnProperty(prop)) {
+                                this.log(`✓ therapeuticData.${prop} - FOUND`, 'success');
+                            } else {
+                                this.log(`✗ therapeuticData.${prop} - MISSING`, 'error');
+                            }
+                        });
+                        
+                        // Test data types
+                        if (Array.isArray(therapeuticData.triggers)) {
+                            this.log(`✓ triggers array (${therapeuticData.triggers.length} items)`, 'success');
+                        } else {
+                            this.log('✗ triggers not an array', 'error');
+                        }
+                        
+                    } else {
+                        this.log('✗ therapeuticData - UNDEFINED', 'error');
+                    }
+                    
+                } catch (error) {
+                    this.log(`✗ Data Integrity Error: ${error.message}`, 'error');
+                }
+            }
+
+            testEventHandlers() {
+                this.log('Testing Event Handlers...', 'info');
+                
+                const buttonsToTest = [
+                    { id: 'trigger-type', event: 'change' },
+                    { id: 'intensity-level', event: 'input' },
+                    { id: 'effectiveness', event: 'input' }
+                ];
+
+                buttonsToTest.forEach(({ id, event }) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        // Create a test event
+                        const testEvent = new Event(event, { bubbles: true });
+                        try {
+                            element.dispatchEvent(testEvent);
+                            this.log(`✓ Event handler ${id}.${event} - OK`, 'success');
+                        } catch (error) {
+                            this.log(`✗ Event handler ${id}.${event} - ERROR: ${error.message}`, 'error');
+                        }
+                    }
+                });
+            }
+
+            testApplicationState() {
+                this.log('Testing Application State...', 'info');
+                
+                try {
+                    // Test crisis thresholds
+                    if (typeof crisisThresholds !== 'undefined') {
+                        this.log('✓ crisisThresholds - DEFINED', 'success');
+                        const requiredThresholds = ['highIntensity', 'frequencyAlert', 'durationAlert', 'lowCoping'];
+                        requiredThresholds.forEach(threshold => {
+                            if (crisisThresholds.hasOwnProperty(threshold)) {
+                                this.log(`✓ crisisThresholds.${threshold} = ${crisisThresholds[threshold]}`, 'success');
+                            } else {
+                                this.log(`✗ crisisThresholds.${threshold} - MISSING`, 'error');
+                            }
+                        });
+                    } else {
+                        this.log('✗ crisisThresholds - UNDEFINED', 'error');
+                    }
+                    
+                    // Test localStorage data
+                    const storedTriggers = localStorage.getItem('therapeuticTriggers');
+                    if (storedTriggers) {
+                        const triggers = JSON.parse(storedTriggers);
+                        this.log(`✓ Stored triggers: ${triggers.length} items`, 'success');
+                    } else {
+                        this.log('ℹ No stored triggers found (normal for new users)', 'info');
+                    }
+                    
+                } catch (error) {
+                    this.log(`✗ Application State Error: ${error.message}`, 'error');
+                }
+            }
+
+            testFunctionDependencies() {
+                this.log('Testing Function Dependencies...', 'info');
+                
+                const dependencyTests = [
+                    {
+                        name: 'safeGetItem',
+                        test: () => {
+                            if (typeof safeGetItem === 'function') {
+                                const result = safeGetItem('nonexistent-key', 'default');
+                                return result === 'default';
+                            }
+                            return false;
+                        }
+                    },
+                    {
+                        name: 'safeSetItem',
+                        test: () => {
+                            if (typeof safeSetItem === 'function') {
+                                return safeSetItem('test-key', { test: true });
+                            }
+                            return false;
+                        }
+                    },
+                    {
+                        name: 'showAlert',
+                        test: () => {
+                            if (typeof showAlert === 'function') {
+                                showAlert('Test message', 'info');
+                                return true;
+                            }
+                            return false;
+                        }
+                    }
+                ];
+
+                dependencyTests.forEach(({ name, test }) => {
+                    try {
+                        if (test()) {
+                            this.log(`✓ ${name} - WORKING`, 'success');
+                        } else {
+                            this.log(`✗ ${name} - FAILED`, 'error');
+                        }
+                    } catch (error) {
+                        this.log(`✗ ${name} - ERROR: ${error.message}`, 'error');
+                    }
+                });
+            }
+
+            generateSummaryReport() {
+                this.log('=== DIAGNOSTIC SUMMARY ===', 'info');
+                
+                const errorCount = this.reports.filter(r => r.type === 'error').length;
+                const warningCount = this.reports.filter(r => r.type === 'warning').length;
+                const successCount = this.reports.filter(r => r.type === 'success').length;
+                
+                this.log(`Total Tests: ${this.reports.length}`, 'info');
+                this.log(`Errors: ${errorCount}`, errorCount > 0 ? 'error' : 'success');
+                this.log(`Warnings: ${warningCount}`, warningCount > 0 ? 'warning' : 'success');
+                this.log(`Successes: ${successCount}`, 'success');
+                
+                if (errorCount === 0) {
+                    this.log('🎉 ALL SYSTEMS OPERATIONAL', 'success');
+                    document.getElementById('system-status').innerHTML = '✅ System Active - All Diagnostics Passed';
+                    document.getElementById('system-status').style.background = 'rgba(72, 187, 120, 0.1)';
+                } else {
+                    this.log('⚠️ ISSUES DETECTED - Review errors above', 'warning');
+                    document.getElementById('system-status').innerHTML = `⚠️ System Issues - ${errorCount} errors detected`;
+                    document.getElementById('system-status').style.background = 'rgba(255, 107, 107, 0.1)';
+                }
+                
+                this.log('=== END SUMMARY ===', 'info');
+            }
+        }
+
+        // Initialize diagnostic system
+        const diagnostics = new DiagnosticSystem();
+
+        // DEBUG CONSOLE CONTROLS
+        function toggleDebugConsole() {
+            const console = document.getElementById('debug-console');
+            if (diagnostics.collapsed) {
+                console.style.height = '250px';
+                diagnostics.collapsed = false;
+            } else {
+                console.style.height = '40px';
+                diagnostics.collapsed = true;
+            }
+        }
+
+        function clearDebugConsole() {
+            document.getElementById('debug-content').innerHTML = '';
+            diagnostics.reports = [];
+        }
+
+        function runDiagnostics() {
+            clearDebugConsole();
+            diagnostics.runFullDiagnostics();
+        }
+
+        // ENHANCED GLOBAL DATA STRUCTURE
+        let therapeuticData = {
+            triggers: [],
+            goals: [],
+            skills: [],
+            emergencyContacts: {},
+            therapistNotes: []
+        };
+
+        let crisisThresholds = {
+            highIntensity: 8,
+            frequencyAlert: 3,
+            durationAlert: 'multiple-days',
+            lowCoping: 3
+        };
+
+        // ENHANCED SAFE OPERATIONS
+        function safeGetItem(key, defaultValue = null) {
+            try {
+                const item = localStorage.getItem(key);
+                return item ? JSON.parse(item) : defaultValue;
+            } catch (e) {
+                diagnostics.log(`Error loading ${key}: ${e.message}`, 'error');
+                return defaultValue;
+            }
+        }
+
+        function safeSetItem(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+                return true;
+            } catch (e) {
+                diagnostics.log(`Error saving ${key}: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        // ENHANCED INITIALIZATION
+        function init() {
+            diagnostics.log('Starting application initialization...', 'info');
+            
+            try {
+                // Load data safely
+                therapeuticData.triggers = safeGetItem('therapeuticTriggers') || [];
+                therapeuticData.goals = safeGetItem('therapeuticGoals') || [];
+                therapeuticData.skills = safeGetItem('skillsPractice') || [];
+                therapeuticData.emergencyContacts = safeGetItem('emergencyContacts') || {};
+                
+                diagnostics.log(`Loaded ${therapeuticData.triggers.length} triggers`, 'success');
+                
+                // Initialize UI components
+                updateEnergyBar();
+                loadProfessionalData();
+                checkCrisisConditions();
+                generateProfessionalInsights();
+                loadEmergencyContacts();
+                updateProgressSummary();
+                
+                diagnostics.log('Application initialization complete', 'success');
+                
+            } catch (error) {
+                diagnostics.log(`Initialization error: ${error.message}`, 'error');
+                showAlert('Initialization error detected. Check debug console.', 'error');
+            }
+        }
+
+        // CORE FUNCTIONS WITH ERROR HANDLING
+        function updateIntensityLabel(value) {
+            try {
+                const labels = {
+                    1: '1 - Very Mild', 2: '2 - Mild', 3: '3 - Noticeable',
+                    4: '4 - Moderate', 5: '5 - Moderate', 6: '6 - Significant',
+                    7: '7 - High', 8: '8 - Very High', 9: '9 - Severe', 10: '10 - Extreme'
+                };
+                const element = document.getElementById('intensity-label');
+                if (element) {
+                    element.textContent = labels[value] || `${value} - Unknown`;
+                }
+            } catch (error) {
+                diagnostics.log(`updateIntensityLabel error: ${error.message}`, 'error');
+            }
+        }
+
+        function updateEffectivenessLabel(value) {
+            try {
+                const labels = {
+                    1: '1 - Not Helpful', 2: '2 - Barely Helpful', 3: '3 - Slightly Helpful',
+                    4: '4 - Somewhat Helpful', 5: '5 - Moderately Helpful', 6: '6 - Helpful',
+                    7: '7 - Very Helpful', 8: '8 - Highly Effective', 9: '9 - Extremely Effective', 10: '10 - Complete Relief'
+                };
+                const element = document.getElementById('effectiveness-label');
+                if (element) {
+                    element.textContent = labels[value] || `${value} - Unknown`;
+                }
+            } catch (error) {
+                diagnostics.log(`updateEffectivenessLabel error: ${error.message}`, 'error');
+            }
+        }
+
+        function logTherapeuticTrigger() {
+            try {
+                diagnostics.log('Logging new therapeutic trigger...', 'info');
+                
+                const description = document.getElementById('trigger-description').value.trim();
+                
+                if (!description) {
+                    showAlert('Please provide a detailed description of the trigger event.', 'warning');
+                    return;
+                }
+
+                const triggerData = {
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    type: document.getElementById('trigger-type').value,
+                    intensity: parseInt(document.getElementById('intensity-level').value),
+                    duration: document.getElementById('duration').value,
+                    location: document.getElementById('context-location').value,
+                    preState: document.getElementById('emotional-state').value,
+                    physicalSymptoms: Array.from(document.getElementById('physical-symptoms').selectedOptions).map(o => o.value),
+                    description: description,
+                    copingUsed: document.getElementById('coping-used').value.trim(),
+                    copingEffectiveness: parseInt(document.getElementById('effectiveness').value),
+                    dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
+                    timeOfDay: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    requiresAttention: false,
+                    therapistNotified: false,
+                    followUpScheduled: false
+                };
+
+                triggerData.riskLevel = assessRiskLevel(triggerData);
+                triggerData.requiresAttention = triggerData.riskLevel === 'high' || triggerData.intensity >= 8;
+
+                therapeuticData.triggers.unshift(triggerData);
+                safeSetItem('therapeuticTriggers', therapeuticData.triggers);
+                
+                clearTriggerForm();
+                updateEnergyBar();
+                loadProfessionalData();
+                checkCrisisConditions();
+                generateProfessionalInsights();
+                updateProgressSummary();
+                
+                diagnostics.log(`Trigger logged successfully (ID: ${triggerData.id})`, 'success');
+                showAlert('Trigger logged successfully. Professional assessment complete.', 'success');
+                
+            } catch (error) {
+                diagnostics.log(`logTherapeuticTrigger error: ${error.message}`, 'error');
+                showAlert('Error logging trigger. Please try again.', 'error');
+            }
+        }
+
+        function assessRiskLevel(trigger) {
+            try {
+                let riskScore = 0;
+                
+                if (trigger.intensity >= 9) riskScore += 3;
+                else if (trigger.intensity >= 7) riskScore += 2;
+                else if (trigger.intensity >= 5) riskScore += 1;
+                
+                if (trigger.duration === 'multiple-days') riskScore += 3;
+                else if (trigger.duration === 'full-day') riskScore += 2;
+                else if (trigger.duration === 'half-day') riskScore += 1;
+                
+                if (trigger.copingEffectiveness <= 3) riskScore += 2;
+                else if (trigger.copingEffectiveness <= 5) riskScore += 1;
+                
+                if (trigger.physicalSymptoms.includes('dissociation')) riskScore += 2;
+                if (trigger.physicalSymptoms.length >= 4) riskScore += 1;
+                
+                if (riskScore >= 6) return 'high';
+                if (riskScore >= 3) return 'medium';
+                return 'low';
+                
+            } catch (error) {
+                diagnostics.log(`assessRiskLevel error: ${error.message}`, 'error');
+                return 'unknown';
+            }
+        }
+
+        function checkCrisisConditions() {
+            try {
+                const recentTriggers = therapeuticData.triggers.filter(t => {
+                    const triggerTime = new Date(t.timestamp);
+                    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                    return triggerTime > oneDayAgo;
+                });
+
+                let crisisDetected = false;
+                let crisisMessage = '';
+
+                if (recentTriggers.length >= crisisThresholds.frequencyAlert) {
+                    crisisDetected = true;
+                    crisisMessage += `High frequency: ${recentTriggers.length} triggers in 24 hours. `;
+                }
+
+                const highIntensityTriggers = recentTriggers.filter(t => t.intensity >= crisisThresholds.highIntensity);
+                if (highIntensityTriggers.length > 0) {
+                    crisisDetected = true;
+                    crisisMessage += `High intensity episodes detected (${highIntensityTriggers.length}). `;
+                }
+
+                if (recentTriggers.length > 0) {
+                    const recentCoping = recentTriggers.map(t => t.copingEffectiveness);
+                    const avgCoping = recentCoping.reduce((a, b) => a + b, 0) / recentCoping.length;
+                    if (avgCoping <= crisisThresholds.lowCoping) {
+                        crisisDetected = true;
+                        crisisMessage += `Low coping effectiveness (${avgCoping.toFixed(1)}/10). `;
+                    }
+                }
+
+                const crisisCard = document.getElementById('crisis-card');
+                const crisisMessageEl = document.getElementById('crisis-message');
+                
+                if (crisisDetected) {
+                    crisisCard.style.display = 'block';
+                    crisisMessageEl.textContent = crisisMessage + 'Professional support recommended.';
+                    diagnostics.log('Crisis conditions detected', 'warning');
+                } else {
+                    crisisCard.style.display = 'none';
+                }
+                
+            } catch (error) {
+                diagnostics.log(`checkCrisisConditions error: ${error.message}`, 'error');
+            }
+        }
+
+        function filterProfessionalLogs() {
+            try {
+                const timeframe = document.getElementById('filter-timeframe').value;
+                const intensity = document.getElementById('filter-intensity').value;
+                
+                let filteredTriggers = [...therapeuticData.triggers];
+                
+                if (timeframe !== 'all') {
+                    const now = new Date();
+                    let cutoffDate;
+                    
+                    switch(timeframe) {
+                        case 'week':
+                            cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                            break;
+                        case 'month':
+                            cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                            break;
+                        case 'quarter':
+                            cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+                            break;
+                    }
+                    
+                    filteredTriggers = filteredTriggers.filter(t => new Date(t.timestamp) > cutoffDate);
+                }
+                
+                if (intensity !== 'all') {
+                    switch(intensity) {
+                        case 'high':
+                            filteredTriggers = filteredTriggers.filter(t => t.intensity >= 8);
+                            break;
+                        case 'medium':
+                            filteredTriggers = filteredTriggers.filter(t => t.intensity >= 5 && t.intensity <= 7);
+                            break;
+                        case 'low':
+                            filteredTriggers = filteredTriggers.filter(t => t.intensity <= 4);
+                            break;
+                    }
+                }
+                
+                displayFilteredLogs(filteredTriggers);
+                
+            } catch (error) {
+                diagnostics.log(`filterProfessionalLogs error: ${error.message}`, 'error');
+            }
+        }
+
+        function displayFilteredLogs(triggers) {
+            try {
+                const container = document.getElementById('professional-logs');
+                
+                if (triggers.length === 0) {
+                    container.innerHTML = '<div class="pattern-insight">No entries match your filter criteria.</div>';
+                    return;
+                }
+                
+                container.innerHTML = triggers.map(trigger => `
+                    <div class="log-entry ${trigger.riskLevel === 'high' ? 'high-risk' : ''}">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${trigger.type.replace('-', ' ').toUpperCase()}</strong>
+                                <span style="margin-left: 10px; color: #666;">Intensity: ${trigger.intensity}/10</span>
+                                <span style="margin-left: 10px; padding: 2px 6px; background: ${getRiskColor(trigger.riskLevel)}; color: white; border-radius: 3px; font-size: 12px;">${trigger.riskLevel.toUpperCase()}</span>
+                            </div>
+                            <small>${new Date(trigger.timestamp).toLocaleDateString()}</small>
+                        </div>
+                        <p style="margin-top: 8px;"><strong>Event:</strong> ${trigger.description}</p>
+                        <div class="context-info">
+                            📍 ${trigger.location} • ⏰ ${trigger.timeOfDay} • ⏱️ ${trigger.duration} • 
+                            🧠 Pre-state: ${trigger.preState} • 🛠️ Coping: ${trigger.copingEffectiveness}/10
+                        </div>
+                        ${trigger.physicalSymptoms.length ? `<div class="context-info">💪 Physical: ${trigger.physicalSymptoms.join(', ')}</div>` : ''}
+                        ${trigger.copingUsed ? `<div class="context-info">🎯 Coping used: ${trigger.copingUsed}</div>` : ''}
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                diagnostics.log(`displayFilteredLogs error: ${error.message}`, 'error');
+            }
+        }
+
+        function loadProfessionalData() {
+            filterProfessionalLogs();
+        }
+
+        function getRiskColor(level) {
+            switch(level) {
+                case 'high': return '#ff6b6b';
+                case 'medium': return '#feca57';
+                case 'low': return '#48bb78';
+                default: return '#667eea';
+            }
+        }
+
+        function showAlert(message, type = 'success') {
+            try {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert ${type}`;
+                alertDiv.textContent = message;
+                alertDiv.style.display = 'block';
+                document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.main-grid'));
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 5000);
+                
+            } catch (error) {
+                diagnostics.log(`showAlert error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearTriggerForm() {
+            try {
+                document.getElementById('trigger-description').value = '';
+                document.getElementById('coping-used').value = '';
+                document.getElementById('intensity-level').value = 5;
+                document.getElementById('effectiveness').value = 5;
+                updateIntensityLabel(5);
+                updateEffectivenessLabel(5);
+                
+                const symptoms = document.getElementById('physical-symptoms');
+                for (let option of symptoms.options) {
+                    option.selected = false;
+                }
+                
+            } catch (error) {
+                diagnostics.log(`clearTriggerForm error: ${error.message}`, 'error');
+            }
+        }
+
+        function updateEnergyBar() {
+            try {
+                const recentTriggers = therapeuticData.triggers.filter(t => {
+                    const triggerDate = new Date(t.timestamp);
+                    const today = new Date();
+                    return triggerDate.toDateString() === today.toDateString();
+                });
+                
+                const totalDrain = recentTriggers.reduce((sum, t) => sum + (t.intensity * 8), 0);
+                const remaining = Math.max(100 - totalDrain, 0);
+                
+                const energyBar = document.getElementById('energy-bar');
+                energyBar.style.width = `${remaining}%`;
+                energyBar.setAttribute('data-energy', remaining);
+                
+                if (remaining > 70) {
+                    energyBar.style.background = 'linear-gradient(45deg, #48bb78, #38a169)';
+                } else if (remaining > 40) {
+                    energyBar.style.background = 'linear-gradient(45deg, #ed8936, #dd6b20)';
+                } else {
+                    energyBar.style.background = 'linear-gradient(45deg, #e53e3e, #c53030)';
+                }
+                
+            } catch (error) {
+                diagnostics.log(`updateEnergyBar error: ${error.message}`, 'error');
+            }
+        }
+
+        function generateProfessionalInsights() {
+            try {
+                const insights = document.getElementById('clinical-insights');
+                const patterns = analyzePatterns();
+                
+                if (therapeuticData.triggers.length < 3) {
+                    insights.innerHTML = '<div class="pattern-insight">Continue logging triggers to generate meaningful pattern analysis.</div>';
+                    return;
+                }
+                
+                insights.innerHTML = `
+                    <div class="pattern-insight">
+                        <h4>Clinical Pattern Summary</h4>
+                        <p><strong>Primary Trigger:</strong> ${patterns.primaryTrigger} (${patterns.frequency[patterns.primaryTrigger] || 0} occurrences)</p>
+                        <p><strong>Average Intensity:</strong> ${patterns.avgIntensity}/10</p>
+                        <p><strong>Coping Effectiveness:</strong> ${patterns.copingEffectiveness}/10</p>
+                        <p><strong>High-Risk Episodes:</strong> ${patterns.highRiskCount}/${patterns.totalTriggers}</p>
+                    </div>
+                    <div class="pattern-insight">
+                        <h4>Recommendations</h4>
+                        <ul>
+                            ${patterns.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                diagnostics.log(`generateProfessionalInsights error: ${error.message}`, 'error');
+            }
+        }
+
+        function analyzePatterns() {
+            try {
+                const triggers = therapeuticData.triggers;
+                if (triggers.length === 0) {
+                    return { 
+                        recommendations: ['Continue monitoring and documentation'],
+                        totalTriggers: 0,
+                        avgIntensity: 0,
+                        copingEffectiveness: 0,
+                        highRiskCount: 0,
+                        frequency: {}
+                    };
+                }
+
+                const totalTriggers = triggers.length;
+                const avgIntensity = (triggers.reduce((sum, t) => sum + t.intensity, 0) / totalTriggers).toFixed(1);
+                const avgCoping = (triggers.reduce((sum, t) => sum + (t.copingEffectiveness || 5), 0) / totalTriggers).toFixed(1);
+                
+                const typeFreq = {};
+                triggers.forEach(t => typeFreq[t.type] = (typeFreq[t.type] || 0) + 1);
+                const primaryTrigger = Object.keys(typeFreq).length > 0 ? 
+                    Object.keys(typeFreq).reduce((a, b) => typeFreq[a] > typeFreq[b] ? a : b) : 'none';
+                
+                const highRiskCount = triggers.filter(t => t.riskLevel === 'high').length;
+                
+                const recommendations = [];
+                if (avgIntensity > 7) recommendations.push('Consider intensive coping skills training');
+                if (avgCoping < 5) recommendations.push('Review current coping strategies');
+                if (highRiskCount > totalTriggers * 0.3) recommendations.push('Increase session frequency');
+                if (recommendations.length === 0) recommendations.push('Continue current therapeutic approach');
+                
+                return {
+                    totalTriggers,
+                    avgIntensity,
+                    copingEffectiveness: avgCoping,
+                    primaryTrigger,
+                    frequency: typeFreq,
+                    highRiskCount,
+                    recommendations
+                };
+                
+            } catch (error) {
+                diagnostics.log(`analyzePatterns error: ${error.message}`, 'error');
+                return { recommendations: ['Error analyzing patterns'], totalTriggers: 0, avgIntensity: 0, copingEffectiveness: 0, highRiskCount: 0, frequency: {} };
+            }
+        }
+
+        function updateProgressSummary() {
+            try {
+                if (therapeuticData.triggers.length === 0) {
+                    document.getElementById('week-intensity').textContent = '--';
+                    document.getElementById('week-frequency').textContent = '0 episodes';
+                    document.getElementById('week-coping').textContent = '--';
+                    return;
+                }
+                
+                const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                const weeklyTriggers = therapeuticData.triggers.filter(t => new Date(t.timestamp) > weekAgo);
+                
+                if (weeklyTriggers.length > 0) {
+                    const avgIntensity = (weeklyTriggers.reduce((sum, t) => sum + t.intensity, 0) / weeklyTriggers.length).toFixed(1);
+                    const avgCoping = (weeklyTriggers.reduce((sum, t) => sum + t.copingEffectiveness, 0) / weeklyTriggers.length).toFixed(1);
+                    
+                    document.getElementById('week-intensity').textContent = `${avgIntensity}/10`;
+                    document.getElementById('week-frequency').textContent = `${weeklyTriggers.length} episodes`;
+                    document.getElementById('week-coping').textContent = `${avgCoping}/10`;
+                }
+                
+            } catch (error) {
+                diagnostics.log(`updateProgressSummary error: ${error.message}`, 'error');
+            }
+        }
+
+        function saveEmergencyContacts() {
+            try {
+                therapeuticData.emergencyContacts = {
+                    therapist: document.getElementById('therapist-contact').value,
+                    emergency: document.getElementById('emergency-contact').value,
+                    updated: new Date().toISOString()
+                };
+                safeSetItem('emergencyContacts', therapeuticData.emergencyContacts);
+                showAlert('Emergency contacts saved successfully.', 'success');
+                
+            } catch (error) {
+                diagnostics.log(`saveEmergencyContacts error: ${error.message}`, 'error');
+            }
+        }
+
+        function loadEmergencyContacts() {
+            try {
+                if (therapeuticData.emergencyContacts.therapist) {
+                    document.getElementById('therapist-contact').value = therapeuticData.emergencyContacts.therapist;
+                }
+                if (therapeuticData.emergencyContacts.emergency) {
+                    document.getElementById('emergency-contact').value = therapeuticData.emergencyContacts.emergency;
+                }
+                
+            } catch (error) {
+                diagnostics.log(`loadEmergencyContacts error: ${error.message}`, 'error');
+            }
+        }
+
+        // PLACEHOLDER FUNCTIONS FOR MISSING FEATURES
+        function addTherapeuticGoal() {
+            showAlert('Add therapeutic goal functionality coming soon!', 'info');
+        }
+
+        function exportTherapistReport() {
+            showAlert('Export therapist report functionality coming soon!', 'info');
+        }
+
+        function exportDataCSV() {
+            showAlert('Export CSV functionality coming soon!', 'info');
+        }
+
+        function exportProgressReport() {
+            showAlert('Export progress report functionality coming soon!', 'info');
+        }
+
+        function exportCrisisReport() {
+            showAlert('Export crisis report functionality coming soon!', 'info');
+        }
+
+        function accessCrisisResources() {
+            showAlert('Crisis resources accessed. Please reach out if you need immediate help.', 'warning');
+        }
+
+        function generateProgressInsights() {
+            generateProfessionalInsights();
+        }
+
+        function startGroundingExercise() {
+            showAlert('Grounding exercise functionality coming soon!', 'info');
+        }
+
+        function startBreathingExercise() {
+            showAlert('Breathing exercise functionality coming soon!', 'info');
+        }
+
+        function startReframingExercise() {
+            showAlert('Reframing exercise functionality coming soon!', 'info');
+        }
+
+        // INITIALIZE APPLICATION
+        window.addEventListener('load', () => {
+            diagnostics.log('Page loaded, starting diagnostics...', 'info');
+            
+            // Run diagnostics first
+            setTimeout(() => {
+                diagnostics.runFullDiagnostics();
+            }, 100);
+            
+            // Then initialize app
+            setTimeout(() => {
+                init();
+            }, 500);
+        });
+
+        // AUTO-SAVE FUNCTIONALITY
+        setInterval(() => {
+            if (therapeuticData.triggers.length > 0) {
+                safeSetItem('therapeuticTriggers', therapeuticData.triggers);
+                diagnostics.log('Auto-save completed', 'info');
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
