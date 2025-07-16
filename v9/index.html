@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jung's AI-Enhanced Therapeutic Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header h1 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .ai-status {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .ai-status.disconnected {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .ai-enhanced-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            grid-column: span 2;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .ai-card {
+            border: 2px solid #667eea;
+            background: linear-gradient(135deg, #e6f3ff, #f0f8ff);
+        }
+
+        .crisis-card {
+            border: 3px solid #ff6b6b;
+            background: linear-gradient(135deg, #ffe0e0, #ffcccc);
+            display: none;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-ai {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+
+        .enhanced-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .enhanced-form .full-width {
+            grid-column: span 2;
+        }
+
+        .ai-assist {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c8);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #48bb78;
+        }
+
+        .ai-chat {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .message.ai {
+            background: linear-gradient(45deg, #e6f3ff, #f0f8ff);
+            border-left: 4px solid #667eea;
+        }
+
+        .message.user {
+            background: #f7fafc;
+            border-left: 4px solid #a0aec0;
+            margin-left: 20px;
+        }
+
+        .trigger-assistant {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .data-insights {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c8);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+
+        .insight-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #48bb78;
+        }
+
+        .typing-indicator {
+            display: none;
+            background: #e6f3ff;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        .typing-dots {
+            display: inline-block;
+            animation: typing 1.5s infinite;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 1; }
+            30% { opacity: 0.5; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .energy-visual {
+            background: #f0f4f8;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .energy-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            transition: all 1s ease;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .energy-bar::after {
+            content: attr(data-energy) '%';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .log-entry {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin: 10px 0;
+            animation: slideIn 0.3s ease;
+        }
+
+        .log-entry.high-risk {
+            border-left-color: #ff6b6b;
+            background: linear-gradient(135deg, #ffe0e0, #fff0f0);
+        }
+
+        .context-info {
+            background: #e2e8f0;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #4a5568;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .ai-enhanced-grid {
+                grid-template-columns: 1fr;
+                grid-column: span 1;
+            }
+            .enhanced-form {
+                grid-template-columns: 1fr;
+            }
+            .enhanced-form .full-width {
+                grid-column: span 1;
+            }
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Jung's AI-Enhanced Therapeutic Companion</h1>
+            <p>Professional-grade trigger tracking with real-time AI analysis and therapeutic insights</p>
+            <div class="ai-status" id="ai-status">🤖 AI Assistant Ready</div>
+        </div>
+
+        <!-- Crisis Alert System -->
+        <div class="card crisis-card" id="crisis-alert">
+            <h2>🚨 Crisis Pattern Detected</h2>
+            <div id="crisis-content">
+                <p id="crisis-message">High-risk patterns detected in your recent entries.</p>
+                <div class="quick-actions">
+                    <button class="btn btn-danger" onclick="exportCrisisReport()">📤 Crisis Report</button>
+                    <button class="btn btn-danger" onclick="contactEmergency()">📞 Emergency Contact</button>
+                    <button class="btn" onclick="startCrisisIntervention()">🛡️ Crisis Support</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- AI-Enhanced Trigger Logger -->
+            <div class="card">
+                <h2>📊 AI-Enhanced Trigger Documentation</h2>
+                <div class="energy-visual">
+                    <div class="energy-bar" id="energy-bar" data-energy="100" style="width: 100%"></div>
+                </div>
+
+                <!-- AI Trigger Assistant -->
+                <div class="trigger-assistant">
+                    <h4>🤖 AI Trigger Description Assistant</h4>
+                    <p>Describe what happened briefly, and I'll help you create a comprehensive professional entry.</p>
+                    <div class="input-group">
+                        <label>Quick Description (I'll help expand this):</label>
+                        <textarea id="quick-description" rows="2" placeholder="E.g., 'Had argument with coworker about project deadline, felt anxious and angry'"></textarea>
+                    </div>
+                    <button class="btn btn-ai" onclick="generateTriggerDescription()">🤖 Generate Full Description</button>
+                </div>
+                
+                <div class="enhanced-form">
+                    <div class="input-group">
+                        <label for="trigger-type">Trigger Category</label>
+                        <select id="trigger-type">
+                            <option value="interpersonal">Interpersonal Conflict</option>
+                            <option value="cognitive">Obsessive Thoughts</option>
+                            <option value="environmental">Environmental Stress</option>
+                            <option value="somatic">Physical/Body Reaction</option>
+                            <option value="memory">Memory/Flashback</option>
+                            <option value="abandonment">Abandonment Fear</option>
+                            <option value="criticism">Criticism/Judgment</option>
+                            <option value="control">Loss of Control</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="intensity-level">Intensity (1-10)</label>
+                        <input type="range" id="intensity-level" min="1" max="10" value="5" oninput="updateIntensityLabel(this.value)">
+                        <span id="intensity-label">5 - Moderate</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="duration">Duration</label>
+                        <select id="duration">
+                            <option value="minutes">Minutes (5-30)</option>
+                            <option value="hours">Hours (1-6)</option>
+                            <option value="half-day">Half Day (6-12 hours)</option>
+                            <option value="full-day">Full Day (12+ hours)</option>
+                            <option value="multiple-days">Multiple Days</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="context-location">Location</label>
+                        <select id="context-location">
+                            <option value="home">Home</option>
+                            <option value="work">Work</option>
+                            <option value="social">Social Setting</option>
+                            <option value="therapy">Therapy Session</option>
+                            <option value="medical">Medical Setting</option>
+                            <option value="public">Public Space</option>
+                            <option value="online">Online/Digital</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="emotional-state">Pre-trigger State</label>
+                        <select id="emotional-state">
+                            <option value="stable">Stable/Baseline</option>
+                            <option value="elevated">Already Stressed</option>
+                            <option value="depressed">Depressed/Low</option>
+                            <option value="anxious">Anxious</option>
+                            <option value="tired">Fatigued</option>
+                            <option value="triggered">Already Triggered</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="physical-symptoms">Physical Symptoms</label>
+                        <select id="physical-symptoms" multiple>
+                            <option value="racing-heart">Racing Heart</option>
+                            <option value="sweating">Sweating</option>
+                            <option value="tension">Muscle Tension</option>
+                            <option value="nausea">Nausea</option>
+                            <option value="headache">Headache</option>
+                            <option value="fatigue">Fatigue</option>
+                            <option value="dissociation">Dissociation</option>
+                            <option value="hypervigilance">Hypervigilance</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="trigger-description">Detailed Description</label>
+                    <textarea id="trigger-description" rows="4" placeholder="AI-generated or manually entered comprehensive description..."></textarea>
+                    <button class="btn btn-ai" onclick="improveDescription()" style="margin-top: 10px;">🤖 AI Improve Description</button>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="coping-used">Coping Strategies Used</label>
+                    <textarea id="coping-used" rows="2" placeholder="What did you try to cope? (breathing, medication, self-talk, calling someone, etc.)"></textarea>
+                    <button class="btn btn-ai" onclick="suggestCoping()" style="margin-top: 10px;">🤖 AI Suggest Coping</button>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="effectiveness">Coping Effectiveness (1-10)</label>
+                    <input type="range" id="effectiveness" min="1" max="10" value="5" oninput="updateEffectivenessLabel(this.value)">
+                    <span id="effectiveness-label">5 - Somewhat Helpful</span>
+                </div>
+
+                <button class="btn" onclick="logAIEnhancedTrigger()">📝 Log with AI Analysis</button>
+            </div>
+
+            <!-- Real-Time AI Analysis Chat -->
+            <div class="card ai-card">
+                <h2>🤖 Real-Time AI Therapeutic Assistant</h2>
+                <div class="ai-chat" id="ai-chat">
+                    <div class="message ai">
+                        <strong>Your AI Therapeutic Assistant:</strong> I have access to all your logged data and can provide insights, pattern analysis, and professional recommendations. I can help you understand your triggers, generate descriptions, and analyze your progress in real-time. What would you like to explore today?
+                    </div>
+                </div>
+                <div class="typing-indicator" id="typing-indicator">
+                    <span class="typing-dots">AI is analyzing your data...</span>
+                </div>
+                <div class="input-group">
+                    <textarea id="ai-message" rows="3" placeholder="Ask me anything about your patterns, triggers, or request analysis of your data..."></textarea>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn btn-ai" onclick="askAI('analyze my patterns')">📊 Analyze Patterns</button>
+                    <button class="btn btn-ai" onclick="askAI('what are my main triggers')">🎯 Main Triggers</button>
+                    <button class="btn btn-ai" onclick="askAI('progress report')">📈 Progress Report</button>
+                </div>
+                <button class="btn" onclick="sendAIMessage()">Send Message</button>
+            </div>
+        </div>
+
+        <div class="ai-enhanced-grid">
+            <!-- Live Data Insights -->
+            <div class="card">
+                <h2>📈 Live AI Data Insights</h2>
+                <div class="data-insights" id="live-insights">
+                    <div class="insight-item">
+                        <h4>🔍 Pattern Recognition</h4>
+                        <p id="pattern-insight">Start logging triggers to see AI-powered pattern analysis...</p>
+                    </div>
+                    <div class="insight-item">
+                        <h4>⚠️ Risk Assessment</h4>
+                        <p id="risk-insight">No current risk indicators detected.</p>
+                    </div>
+                    <div class="insight-item">
+                        <h4>💡 AI Recommendations</h4>
+                        <p id="recommendation-insight">Continue consistent logging for personalized insights.</p>
+                    </div>
+                </div>
+                <button class="btn btn-ai" onclick="generateLiveInsights()">🔄 Refresh AI Analysis</button>
+            </div>
+
+            <!-- AI-Powered Professional Reports -->
+            <div class="card">
+                <h2>📋 AI-Generated Professional Reports</h2>
+                <div class="quick-actions">
+                    <button class="btn" onclick="generateAITherapistReport()">📄 AI Therapist Report</button>
+                    <button class="btn" onclick="generateAIProgressReport()">📈 AI Progress Analysis</button>
+                    <button class="btn" onclick="generateAICrisisReport()">🚨 AI Crisis Assessment</button>
+                </div>
+                
+                <div class="ai-assist">
+                    <h4>🤖 AI Report Customization</h4>
+                    <div class="input-group">
+                        <label>Focus Areas for Report:</label>
+                        <select id="report-focus" multiple>
+                            <option value="patterns">Trigger Patterns</option>
+                            <option value="intensity">Intensity Trends</option>
+                            <option value="coping">Coping Effectiveness</option>
+                            <option value="risk">Risk Assessment</option>
+                            <option value="progress">Progress Tracking</option>
+                            <option value="recommendations">Clinical Recommendations</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Report Time Period:</label>
+                        <select id="report-period">
+                            <option value="week">Past Week</option>
+                            <option value="month">Past Month</option>
+                            <option value="quarter">Past 3 Months</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-ai" onclick="generateCustomAIReport()">🤖 Generate Custom AI Report</button>
+                </div>
+            </div>
+
+            <!-- Emergency & Crisis AI Support -->
+            <div class="card">
+                <h2>🆘 AI Crisis Support System</h2>
+                <div class="ai-assist">
+                    <h4>🤖 24/7 AI Crisis Assessment</h4>
+                    <p>The AI continuously monitors your entries for crisis indicators and can provide immediate support recommendations.</p>
+                    <button class="btn btn-ai" onclick="requestCrisisAssessment()">🔍 Request Crisis Assessment</button>
+                    <button class="btn btn-ai" onclick="startAICrisisChat()">💬 Crisis Support Chat</button>
+                </div>
+                
+                <div class="input-group">
+                    <label>Your Therapist Contact:</label>
+                    <input type="text" id="therapist-contact" placeholder="Phone number or emergency contact">
+                </div>
+                <div class="input-group">
+                    <label>Trusted Emergency Contact:</label>
+                    <input type="text" id="emergency-contact" placeholder="Friend/family member">
+                </div>
+                <button class="btn" onclick="saveEmergencyContacts()">💾 Save Contacts</button>
+            </div>
+
+            <!-- Professional Trigger Log with AI Analysis -->
+            <div class="card">
+                <h2>📋 AI-Analyzed Trigger Log</h2>
+                <div id="professional-filters">
+                    <select id="filter-timeframe">
+                        <option value="week">Past Week</option>
+                        <option value="month">Past Month</option>
+                        <option value="quarter">Past 3 Months</option>
+                        <option value="all">All Time</option>
+                    </select>
+                    <select id="filter-intensity">
+                        <option value="all">All Intensities</option>
+                        <option value="high">High Risk (8-10)</option>
+                        <option value="medium">Medium (5-7)</option>
+                        <option value="low">Low (1-4)</option>
+                    </select>
+                    <button class="btn" onclick="filterAndAnalyzeLogs()">🔍 Filter & AI Analyze</button>
+                </div>
+                <div id="professional-logs"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced data structure with AI integration
+        let therapeuticData = {
+            triggers: JSON.parse(localStorage.getItem('therapeuticTriggers')) || [],
+            goals: JSON.parse(localStorage.getItem('therapeuticGoals')) || [],
+            skills: JSON.parse(localStorage.getItem('skillsPractice')) || [],
+            emergencyContacts: JSON.parse(localStorage.getItem('emergencyContacts')) || {},
+            aiConversations: JSON.parse(localStorage.getItem('aiConversations')) || [],
+            aiInsights: JSON.parse(localStorage.getItem('aiInsights')) || []
+        };
+
+        let aiConfig = {
+            isConnected: false,
+            lastAnalysis: null,
+            conversationHistory: []
+        };
+
+        // Initialize AI-enhanced system
+        function init() {
+            checkAIConnection();
+            loadProfessionalData();
+            updateEnergyBar();
+            checkCrisisConditions();
+            generateLiveInsights();
+            loadEmergencyContacts();
+            initializeAIChat();
+        }
+
+        function checkAIConnection() {
+            // Check if window.claude.complete is available
+            if (typeof window.claude !== 'undefined' && window.claude.complete) {
+                aiConfig.isConnected = true;
+                document.getElementById('ai-status').textContent = '🤖 AI Assistant Connected';
+                document.getElementById('ai-status').className = 'ai-status';
+            } else {
+                aiConfig.isConnected = false;
+                document.getElementById('ai-status').textContent = '⚠️ AI Assistant Offline';
+                document.getElementById('ai-status').className = 'ai-status disconnected';
+            }
+        }
+
+        function updateIntensityLabel(value) {
+            const labels = {
+                1: '1 - Very Mild', 2: '2 - Mild', 3: '3 - Noticeable',
+                4: '4 - Moderate', 5: '5 - Moderate', 6: '6 - Significant',
+                7: '7 - High', 8: '8 - Very High', 9: '9 - Severe', 10: '10 - Extreme'
+            };
+            document.getElementById('intensity-label').textContent = labels[value];
+        }
+
+        function updateEffectivenessLabel(value) {
+            const labels = {
+                1: '1 - Not Helpful', 2: '2 - Barely Helpful', 3: '3 - Slightly Helpful',
+                4: '4 - Somewhat Helpful', 5: '5 - Moderately Helpful', 6: '6 - Helpful',
+                7: '7 - Very Helpful', 8: '8 - Highly Effective', 9: '9 - Extremely Effective', 10: '10 - Complete Relief'
+            };
+            document.getElementById('effectiveness-label').textContent = labels[value];
+        }
+
+        // AI-Enhanced Trigger Description Generation
+        async function generateTriggerDescription() {
+            const quickDesc = document.getElementById('quick-description').value.trim();
+            if (!quickDesc) {
+                alert('Please enter a brief description first.');
+                return;
+            }
+
+            if (!aiConfig.isConnected) {
+                generateMockTriggerDescription(quickDesc);
+                return;
+            }
+
+            showTyping();
+            
+            try {
+                const prompt = `
+You are a therapeutic AI assistant helping someone document a trigger event. Based on this brief description: "${quickDesc}"
+
+Please generate a comprehensive, professional trigger description that includes:
+1. What happened before the trigger (antecedents)
+2. The trigger event itself (clear, factual description)
+3. The person's immediate reactions (emotional, physical, cognitive)
+4. What happened after (consequences, duration)
+
+Make it suitable for therapeutic documentation. Be empathetic but clinical. Format as a single paragraph.
+
+RESPOND ONLY WITH THE TRIGGER DESCRIPTION - NO ADDITIONAL TEXT.
+                `;
+
+                const response = await window.claude.complete(prompt);
+                document.getElementById('trigger-description').value = response.trim();
+                addAIMessage(`I've generated a comprehensive trigger description based on: "${quickDesc}". You can edit it as needed.`);
+                
+            } catch (error) {
+                console.error('AI generation error:', error);
+                generateMockTriggerDescription(quickDesc);
+            }
+            
+            hideTyping();
+        }
+
+        function generateMockTriggerDescription(quickDesc) {
+            // Fallback mock generation for when AI is not available
+            const expanded = `Trigger Event Documentation: ${quickDesc}. Prior to this incident, I was in a ${document.getElementById('emotional-state').value} emotional state at ${document.getElementById('context-location').value}. The triggering event involved ${quickDesc.toLowerCase()}. My immediate reaction included feelings of distress and physical symptoms. This episode lasted approximately ${document.getElementById('duration').value} and had an intensity level of ${document.getElementById('intensity-level').value}/10. Recovery involved the use of coping strategies with varying degrees of effectiveness.`;
+            
+            document.getElementById('trigger-description').value = expanded;
+            addAIMessage(`I've generated an expanded description. (Note: AI is offline - using basic expansion)`);
+        }
+
+        async function improveDescription() {
+            const currentDesc = document.getElementById('trigger-description').value.trim();
+            if (!currentDesc) {
+                alert('Please enter a description first.');
+                return;
+            }
+
+            if (!aiConfig.isConnected) {
+                addAIMessage('AI is offline. Description improvement not available.');
+                return;
+            }
+
+            showTyping();
+            
+            try {
+                const allData = gatherAllCurrentData();
+                const prompt = `
+You are a therapeutic AI assistant. Please improve this trigger description for professional therapeutic documentation:
+
+Current description: "${currentDesc}"
+
+Additional context:
+- Trigger type: ${allData.type}
+- Intensity: ${allData.intensity}/10
+- Duration: ${allData.duration}
+- Location: ${allData.location}
+- Pre-trigger state: ${allData.preState}
+- Physical symptoms: ${allData.physicalSymptoms.join(', ')}
+
+Make the description more comprehensive, therapeutic-appropriate, and include relevant clinical details while maintaining the person's voice. Focus on observable behaviors, emotions, and reactions.
+
+RESPOND ONLY WITH THE IMPROVED DESCRIPTION - NO ADDITIONAL TEXT.
+                `;
+
+                const response = await window.claude.complete(prompt);
+                document.getElementById('trigger-description').value = response.trim();
+                addAIMessage('I\'ve improved your description with additional clinical details and therapeutic language.');
+                
+            } catch (error) {
+                console.error('AI improvement error:', error);
+                addAIMessage('Error improving description. Please try again.');
+            }
+            
+            hideTyping();
+        }
+
+        async function suggestCoping() {
+            const triggerType = document.getElementById('trigger-type').value;
+            const intensity = document.getElementById('intensity-level').value;
+            const currentCoping = document.getElementById('coping-used').value;
+
+            if (!aiConfig.isConnected) {
+                const mockSuggestions = getMockCopingSuggestions(triggerType);
+                addAIMessage(`Suggested coping strategies for ${triggerType}: ${mockSuggestions}`);
+                return;
+            }
+
+            showTyping();
+            
+            try {
+                const recentTriggers = therapeuticData.triggers.slice(0, 5);
+                const prompt = `
+Based on this trigger information:
+- Type: ${triggerType}
+- Intensity: ${intensity}/10
+- Current coping attempted: ${currentCoping || 'none specified'}
+- Recent trigger history: ${JSON.stringify(recentTriggers)}
+
+Suggest 3-4 specific, evidence-based coping strategies that would be most effective for this type of trigger and intensity level. Consider what has worked before based on the history.
+
+Focus on immediate, practical strategies they can use right now. Be specific and actionable.
+
+Format as a bullet-pointed list.
+                `;
+
+                const response = await window.claude.complete(prompt);
+                addAIMessage(`Here are personalized coping suggestions: ${response}`);
+                
+                // Optionally pre-fill the coping field with suggestions
+                if (!currentCoping) {
+                    document.getElementById('coping-used').value = response.replace(/[•\-]/g, '').trim();
+                }
+                
+            } catch (error) {
+                console.error('AI coping suggestion error:', error);
+                const mockSuggestions = getMockCopingSuggestions(triggerType);
+                addAIMessage(`Suggested coping strategies: ${mockSuggestions}`);
+            }
+            
+            hideTyping();
+        }
+
+        function getMockCopingSuggestions(triggerType) {
+            const suggestions = {
+                'interpersonal': 'Deep breathing, assertive communication, boundary setting, seeking support',
+                'cognitive': 'Thought challenging, mindfulness meditation, grounding techniques, cognitive restructuring',
+                'environmental': 'Environmental modification, stress reduction techniques, sensory grounding',
+                'somatic': 'Progressive muscle relaxation, breathing exercises, physical movement, body awareness',
+                'memory': 'Grounding techniques, present-moment awareness, safe space visualization, professional support',
+                'abandonment': 'Self-soothing techniques, connection with support network, reality testing, mindfulness',
+                'criticism': 'Self-compassion practices, cognitive reframing, assertiveness training, support seeking',
+                'control': 'Acceptance techniques, mindfulness, focusing on controllables, stress management'
+            };
+            return suggestions[triggerType] || 'Deep breathing, mindfulness, seeking support, professional consultation';
+        }
+
+        function gatherAllCurrentData() {
+            return {
+                type: document.getElementById('trigger-type').value,
+                intensity: parseInt(document.getElementById('intensity-level').value),
+                duration: document.getElementById('duration').value,
+                location: document.getElementById('context-location').value,
+                preState: document.getElementById('emotional-state').value,
+                physicalSymptoms: Array.from(document.getElementById('physical-symptoms').selectedOptions).map(o => o.value),
+                description: document.getElementById('trigger-description').value,
+                copingUsed: document.getElementById('coping-used').value,
+                copingEffectiveness: parseInt(document.getElementById('effectiveness').value)
+            };
+        }
+
+        // Enhanced trigger logging with AI analysis
+        async function logAIEnhancedTrigger() {
+            const triggerData = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                ...gatherAllCurrentData(),
+                
+                // Clinical metadata
+                dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
+                timeOfDay: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                
+                // AI analysis will be added
+                aiAnalysis: null,
+                riskLevel: null,
+                aiRecommendations: []
+            };
+
+            // Validate required fields
+            if (!triggerData.description.trim()) {
+                alert('Please provide a description of the trigger event.');
+                return;
+            }
+
+            // Get AI analysis if connected
+            if (aiConfig.isConnected) {
+                triggerData.aiAnalysis = await getAITriggerAnalysis(triggerData);
+                triggerData.riskLevel = await getAIRiskAssessment(triggerData);
+                triggerData.aiRecommendations = await getAIRecommendations(triggerData);
+            } else {
+                triggerData.riskLevel = calculateBasicRiskLevel(triggerData);
+            }
+
+            therapeuticData.triggers.unshift(triggerData);
+            saveTherapeuticData();
+            
+            // Clear form
+            clearTriggerForm();
+            
+            // Update displays
+            loadProfessionalData();
+            checkCrisisConditions();
+            generateLiveInsights();
+            
+            // Show AI insights
+            if (triggerData.aiAnalysis) {
+                addAIMessage(`Trigger logged successfully! AI Analysis: ${triggerData.aiAnalysis}`);
+                if (triggerData.aiRecommendations.length > 0) {
+                    addAIMessage(`Recommendations: ${triggerData.aiRecommendations.join(', ')}`);
+                }
+            } else {
+                addAIMessage('Trigger logged successfully. Basic analysis complete.');
+            }
+        }
+
+        async function getAITriggerAnalysis(triggerData) {
+            if (!aiConfig.isConnected) return null;
+            
+            try {
+                const recentTriggers = therapeuticData.triggers.slice(0, 10);
+                const prompt = `
+Analyze this trigger event in the context of the person's history:
+
+Current trigger: ${JSON.stringify(triggerData)}
+Recent history: ${JSON.stringify(recentTriggers)}
+
+Provide a brief clinical analysis (2-3 sentences) covering:
+1. Pattern recognition
+2. Severity assessment
+3. Key therapeutic insights
+
+Be professional but empathetic. Focus on actionable insights.
+                `;
+
+                const analysis = await window.claude.complete(prompt);
+                return analysis.trim();
+            } catch (error) {
+                console.error('AI analysis error:', error);
+                return null;
+            }
+        }
+
+        async function getAIRiskAssessment(triggerData) {
+            if (!aiConfig.isConnected) return calculateBasicRiskLevel(triggerData);
+            
+            try {
+                const recentTriggers = therapeuticData.triggers.slice(0, 5);
+                const prompt = `
+Assess the risk level for this trigger event:
+
+Current trigger: Intensity ${triggerData.intensity}/10, Duration: ${triggerData.duration}, Type: ${triggerData.type}
+Recent triggers: ${JSON.stringify(recentTriggers)}
+Physical symptoms: ${triggerData.physicalSymptoms.join(', ')}
+Coping effectiveness: ${triggerData.copingEffectiveness}/10
+
+Respond with exactly one word: "low", "medium", or "high"
+                `;
+
+                const riskLevel = await window.claude.complete(prompt);
+                return riskLevel.trim().toLowerCase();
+            } catch (error) {
+                console.error('AI risk assessment error:', error);
+                return calculateBasicRiskLevel(triggerData);
+            }
+        }
+
+        async function getAIRecommendations(triggerData) {
+            if (!aiConfig.isConnected) return [];
+            
+            try {
+                const prompt = `
+Based on this trigger event, provide 2-3 specific therapeutic recommendations:
+
+Trigger: ${JSON.stringify(triggerData)}
+
+Format as a comma-separated list of brief, actionable recommendations.
+                `;
+
+                const recommendations = await window.claude.complete(prompt);
+                return recommendations.split(',').map(r => r.trim());
+            } catch (error) {
+                console.error('AI recommendations error:', error);
+                return [];
+            }
+        }
+
+        function calculateBasicRiskLevel(trigger) {
+            let riskScore = 0;
+            
+            if (trigger.intensity >= 8) riskScore += 3;
+            else if (trigger.intensity >= 6) riskScore += 2;
+            else if (trigger.intensity >= 4) riskScore += 1;
+            
+            if (trigger.duration === 'multiple-days') riskScore += 3;
+            else if (trigger.duration === 'full-day') riskScore += 2;
+            
+            if (trigger.copingEffectiveness <= 3) riskScore += 2;
+            
+            if (trigger.physicalSymptoms.includes('dissociation')) riskScore += 2;
+            
+            if (riskScore >= 6) return 'high';
+            if (riskScore >= 3) return 'medium';
+            return 'low';
+        }
+
+        // AI Chat System
+        function initializeAIChat() {
+            // Load conversation history
+            if (therapeuticData.aiConversations.length > 0) {
+                therapeuticData.aiConversations.slice(-10).forEach(conv => {
+                    addMessageToChat(conv.role, conv.content);
+                });
+            }
+        }
+
+        async function sendAIMessage() {
+            const messageInput = document.getElementById('ai-message');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            addMessageToChat('user', message);
+            messageInput.value = '';
+            
+            // Save to conversation history
+            therapeuticData.aiConversations.push({
+                role: 'user',
+                content: message,
+                timestamp: new Date().toISOString()
+            });
+            
+            if (!aiConfig.isConnected) {
+                addMessageToChat('ai', 'AI is currently offline. Please check your connection and try again.');
+                return;
+            }
+            
+            showTyping();
+            
+            try {
+                const response = await getAIResponse(message);
+                addMessageToChat('ai', response);
+                
+                // Save AI response
+                therapeuticData.aiConversations.push({
+                    role: 'ai',
+                    content: response,
+                    timestamp: new Date().toISOString()
+                });
+                
+                saveTherapeuticData();
+            } catch (error) {
+                console.error('AI response error:', error);
+                addMessageToChat('ai', 'I encountered an error processing your request. Please try again.');
+            }
+            
+            hideTyping();
+        }
+
+        async function getAIResponse(userMessage) {
+            const allData = {
+                triggers: therapeuticData.triggers,
+                recentConversation: therapeuticData.aiConversations.slice(-10),
+                currentState: gatherAllCurrentData()
+            };
+            
+            const prompt = `
+You are a therapeutic AI assistant with full access to the user's trigger data and conversation history. 
+
+User message: "${userMessage}"
+
+Complete data context: ${JSON.stringify(allData)}
+
+Provide a helpful, therapeutic response that:
+1. Addresses their specific question
+2. Uses their actual logged data for insights
+3. Offers practical, evidence-based suggestions
+4. Maintains a professional but warm therapeutic tone
+5. Provides specific examples from their data when relevant
+
+Keep responses focused and actionable.
+            `;
+            
+            const response = await window.claude.complete(prompt);
+            return response.trim();
+        }
+
+        async function askAI(predefinedQuery) {
+            document.getElementById('ai-message').value = predefinedQuery;
+            await sendAIMessage();
+        }
+
+        function addMessageToChat(role, content) {
+            const chatContainer = document.getElementById('ai-chat');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            if (role === 'ai') {
+                messageDiv.innerHTML = `<strong>AI Therapeutic Assistant:</strong> ${content}`;
+            } else {
+                messageDiv.innerHTML = `<strong>You:</strong> ${content}`;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function addAIMessage(content) {
+            addMessageToChat('ai', content);
+        }
+
+        function showTyping() {
+            document.getElementById('typing-indicator').style.display = 'block';
+        }
+
+        function hideTyping() {
+            document.getElementById('typing-indicator').style.display = 'none';
+        }
+
+        // Live AI Insights Generation
+        async function generateLiveInsights() {
+            if (therapeuticData.triggers.length === 0) {
+                document.getElementById('pattern-insight').textContent = 'Start logging triggers to see AI-powered pattern analysis...';
+                document.getElementById('risk-insight').textContent = 'No current risk indicators detected.';
+                document.getElementById('recommendation-insight').textContent = 'Continue consistent logging for personalized insights.';
+                return;
+            }
+
+            if (!aiConfig.isConnected) {
+                generateBasicInsights();
+                return;
+            }
+
+            try {
+                const recentTriggers = therapeuticData.triggers.slice(0, 20);
+                
+                // Pattern Analysis
+                const patternPrompt = `
+Analyze these trigger patterns and provide a brief insight (1-2 sentences):
+${JSON.stringify(recentTriggers)}
+
+Focus on the most significant pattern you notice.
+                `;
+                
+                const patternInsight = await window.claude.complete(patternPrompt);
+                document.getElementById('pattern-insight').textContent = patternInsight.trim();
+                
+                // Risk Assessment
+                const riskPrompt = `
+Assess current risk level based on recent triggers:
+${JSON.stringify(recentTriggers.slice(0, 5))}
+
+Provide a brief risk assessment (1 sentence).
+                `;
+                
+                const riskInsight = await window.claude.complete(riskPrompt);
+                document.getElementById('risk-insight').textContent = riskInsight.trim();
+                
+                // Recommendations
+                const recPrompt = `
+Based on these patterns, provide 1-2 brief therapeutic recommendations:
+${JSON.stringify(recentTriggers)}
+
+Be specific and actionable.
+                `;
+                
+                const recommendations = await window.claude.complete(recPrompt);
+                document.getElementById('recommendation-insight').textContent = recommendations.trim();
+                
+            } catch (error) {
+                console.error('Live insights error:', error);
+                generateBasicInsights();
+            }
+        }
+
+        function generateBasicInsights() {
+            const triggers = therapeuticData.triggers;
+            if (triggers.length === 0) return;
+            
+            const avgIntensity = triggers.slice(0, 10).reduce((sum, t) => sum + t.intensity, 0) / Math.min(triggers.length, 10);
+            const typeFreq = {};
+            triggers.forEach(t => typeFreq[t.type] = (typeFreq[t.type] || 0) + 1);
+            const primaryTrigger = Object.keys(typeFreq).reduce((a, b) => typeFreq[a] > typeFreq[b] ? a : b);
+            
+            document.getElementById('pattern-insight').textContent = `Primary trigger type: ${primaryTrigger} (${typeFreq[primaryTrigger]} occurrences). Average intensity: ${avgIntensity.toFixed(1)}/10`;
+            
+            const highRiskCount = triggers.slice(0, 5).filter(t => (t.riskLevel === 'high' || t.intensity >= 8)).length;
+            document.getElementById('risk-insight').textContent = highRiskCount > 2 ? 'Multiple high-intensity episodes detected recently.' : 'Risk levels appear manageable.';
+            
+            document.getElementById('recommendation-insight').textContent = `Focus on coping strategies for ${primaryTrigger} triggers. Consider discussing patterns with therapist.`;
+        }
+
+        // Crisis Management
+        function checkCrisisConditions() {
+            const recentTriggers = therapeuticData.triggers.filter(t => {
+                const triggerTime = new Date(t.timestamp);
+                const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                return triggerTime > oneDayAgo;
+            });
+
+            let crisisDetected = false;
+            let crisisMessage = '';
+
+            // Check for high frequency
+            if (recentTriggers.length >= 3) {
+                crisisDetected = true;
+                crisisMessage += `High frequency: ${recentTriggers.length} triggers in 24 hours. `;
+            }
+
+            // Check for high intensity
+            const highIntensityTriggers = recentTriggers.filter(t => t.intensity >= 8);
+            if (highIntensityTriggers.length > 0) {
+                crisisDetected = true;
+                crisisMessage += `High intensity episodes detected (${highIntensityTriggers.length}). `;
+            }
+
+            if (crisisDetected) {
+                document.getElementById('crisis-alert').style.display = 'block';
+                document.getElementById('crisis-message').textContent = crisisMessage + 'Professional support recommended.';
+            } else {
+                document.getElementById('crisis-alert').style.display = 'none';
+            }
+        }
+
+        async function requestCrisisAssessment() {
+            if (!aiConfig.isConnected) {
+                addAIMessage('AI crisis assessment is offline. Please contact your emergency contacts if you need immediate support.');
+                return;
+            }
+
+            showTyping();
+            
+            try {
+                const recentTriggers = therapeuticData.triggers.slice(0, 10);
+                const prompt = `
+Perform a crisis assessment based on recent trigger data:
+${JSON.stringify(recentTriggers)}
+
+Assess:
+1. Immediate risk level (low/medium/high)
+2. Recommended actions
+3. Whether professional intervention is suggested
+
+Provide a supportive but professional assessment.
+                `;
+                
+                const assessment = await window.claude.complete(prompt);
+                addAIMessage(`Crisis Assessment: ${assessment}`);
+                
+            } catch (error) {
+                console.error('Crisis assessment error:', error);
+                addAIMessage('Error performing crisis assessment. Please contact emergency services if in immediate danger.');
+            }
+            
+            hideTyping();
+        }
+
+        // AI Report Generation
+        async function generateAITherapistReport() {
+            if (!aiConfig.isConnected) {
+                alert('AI report generation requires active AI connection.');
+                return;
+            }
+
+            const reportFocus = Array.from(document.getElementById('report-focus').selectedOptions).map(o => o.value);
+            const reportPeriod = document.getElementById('report-period').value;
+            
+            const triggers = filterTriggersByPeriod(reportPeriod);
+            
+            try {
+                const prompt = `
+Generate a professional therapeutic report based on this trigger data:
+${JSON.stringify(triggers)}
+
+Focus areas: ${reportFocus.join(', ')}
+Time period: ${reportPeriod}
+
+Create a comprehensive report suitable for a therapist including:
+1. Executive summary
+2. Key patterns and insights
+3. Risk assessment
+4. Clinical recommendations
+5. Progress indicators
+
+Format professionally but concisely.
+                `;
+                
+                const report = await window.claude.complete(prompt);
+                downloadAIReport(report, 'ai-therapist-report.html');
+                
+            } catch (error) {
+                console.error('AI report generation error:', error);
+                alert('Error generating AI report. Please try again.');
+            }
+        }
+
+        function filterTriggersByPeriod(period) {
+            const now = new Date();
+            const cutoffDates = {
+                'week': new Date(now - 7 * 24 * 60 * 60 * 1000),
+                'month': new Date(now - 30 * 24 * 60 * 60 * 1000),
+                'quarter': new Date(now - 90 * 24 * 60 * 60 * 1000),
+                'all': new Date(0)
+            };
+            
+            const cutoff = cutoffDates[period];
+            return therapeuticData.triggers.filter(t => new Date(t.timestamp) > cutoff);
+        }
+
+        function downloadAIReport(content, filename) {
+            const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI-Generated Therapeutic Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .ai-badge { background: #667eea; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AI-Generated Therapeutic Report <span class="ai-badge">AI POWERED</span></h1>
+        <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+        <p><strong>AI Analysis Date:</strong> ${new Date().toLocaleString()}</p>
+    </div>
+    <div style="white-space: pre-wrap;">${content}</div>
+</body>
+</html>`;
+            
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Utility Functions
+        function saveTherapeuticData() {
+            localStorage.setItem('therapeuticTriggers', JSON.stringify(therapeuticData.triggers));
+            localStorage.setItem('therapeuticGoals', JSON.stringify(therapeuticData.goals));
+            localStorage.setItem('skillsPractice', JSON.stringify(therapeuticData.skills));
+            localStorage.setItem('emergencyContacts', JSON.stringify(therapeuticData.emergencyContacts));
+            localStorage.setItem('aiConversations', JSON.stringify(therapeuticData.aiConversations));
+            localStorage.setItem('aiInsights', JSON.stringify(therapeuticData.aiInsights));
+        }
+
+        function loadProfessionalData() {
+            const container = document.getElementById('professional-logs');
+            const recentTriggers = therapeuticData.triggers.slice(0, 10);
+            
+            container.innerHTML = recentTriggers.map(trigger => `
+                <div class="log-entry ${trigger.riskLevel === 'high' ? 'high-risk' : ''}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${trigger.type.replace('-', ' ').toUpperCase()}</strong>
+                            <span style="margin-left: 10px; color: #666;">Intensity: ${trigger.intensity}/10</span>
+                            <span style="margin-left: 10px; padding: 2px 6px; background: ${getRiskColor(trigger.riskLevel)}; color: white; border-radius: 3px; font-size: 12px;">${(trigger.riskLevel || 'unknown').toUpperCase()}</span>
+                            ${trigger.aiAnalysis ? '<span style="margin-left: 10px; background: #667eea; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">AI</span>' : ''}
+                        </div>
+                        <small>${new Date(trigger.timestamp).toLocaleDateString()}</small>
+                    </div>
+                    <p style="margin-top: 8px;"><strong>Event:</strong> ${trigger.description}</p>
+                    ${trigger.aiAnalysis ? `<div class="ai-assist" style="margin-top: 10px;"><strong>AI Analysis:</strong> ${trigger.aiAnalysis}</div>` : ''}
+                    <div class="context-info">
+                        📍 ${trigger.location} • ⏰ ${trigger.timeOfDay} • ⏱️ ${trigger.duration} • 
+                        🧠 Pre-state: ${trigger.preState} • 🛠️ Coping: ${trigger.copingEffectiveness}/10
+                    </div>
+                    ${trigger.physicalSymptoms && trigger.physicalSymptoms.length ? `<div class="context-info">💪 Physical: ${trigger.physicalSymptoms.join(', ')}</div>` : ''}
+                    ${trigger.copingUsed ? `<div class="context-info">🎯 Coping used: ${trigger.copingUsed}</div>` : ''}
+                    ${trigger.aiRecommendations && trigger.aiRecommendations.length ? `<div class="context-info">🤖 AI Recommendations: ${trigger.aiRecommendations.join(', ')}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function getRiskColor(level) {
+            switch(level) {
+                case 'high': return '#ff6b6b';
+                case 'medium': return '#feca57';
+                case 'low': return '#48bb78';
+                default: return '#667eea';
+            }
+        }
+
+        function clearTriggerForm() {
+            document.getElementById('quick-description').value = '';
+            document.getElementById('trigger-description').value = '';
+            document.getElementById('coping-used').value = '';
+            document.getElementById('intensity-level').value = 5;
+            document.getElementById('effectiveness').value = 5;
+            updateIntensityLabel(5);
+            updateEffectivenessLabel(5);
+        }
+
+        function updateEnergyBar() {
+            const recentTriggers = therapeuticData.triggers.filter(t => {
+                const triggerDate = new Date(t.timestamp);
+                const today = new Date();
+                return triggerDate.toDateString() === today.toDateString();
+            });
+            
+            const totalDrain = recentTriggers.reduce((sum, t) => sum + (t.intensity * 10), 0);
+            const remaining = Math.max(100 - totalDrain, 0);
+            
+            const energyBar = document.getElementById('energy-bar');
+            energyBar.style.width = `${remaining}%`;
+            energyBar.setAttribute('data-energy', remaining);
+        }
+
+        function loadEmergencyContacts() {
+            if (therapeuticData.emergencyContacts.therapist) {
+                document.getElementById('therapist-contact').value = therapeuticData.emergencyContacts.therapist;
+            }
+            if (therapeuticData.emergencyContacts.emergency) {
+                document.getElementById('emergency-contact').value = therapeuticData.emergencyContacts.emergency;
+            }
+        }
+
+        function saveEmergencyContacts() {
+            therapeuticData.emergencyContacts = {
+                therapist: document.getElementById('therapist-contact').value,
+                emergency: document.getElementById('emergency-contact').value,
+                updated: new Date().toISOString()
+            };
+            saveTherapeuticData();
+            addAIMessage('Emergency contacts saved successfully.');
+        }
+
+        // Handle Enter key in AI chat
+        document.getElementById('ai-message').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendAIMessage();
+            }
+        });
+
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
